@@ -10,6 +10,7 @@ class Requestable extends RawRequestable {
   requestRaw(HttpRequest httpRequest, List<String> subs) async {
     var response = httpRequest.response
       ..headers.contentType = getContentType()
+      ..headers.add('Access-Control-Allow-Origin', '*')
       ..statusCode = 200;
     var apiResponse = request(subs, httpRequest.uri.queryParameters);
     var sending = apiResponse;

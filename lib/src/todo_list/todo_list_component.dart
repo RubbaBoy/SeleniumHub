@@ -1,6 +1,7 @@
 //import 'dart:io';
 
 
+import 'dart:convert';
 import 'dart:html';
 
 import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
@@ -30,34 +31,23 @@ class TodoListComponent implements OnInit {
 
   List<SeleniumInstance> instances = [];
 
-  Future getData() async {
-    var path = '//localhost:6969/api/getInstances?limit=3&skip=1';
+  Future<String> getData() async {
+    var path = '//localhost:6969/api/getInstances';
     try {
       return await HttpRequest.getString(path);
     } catch (e) {
       print('Couldn\'t open $path');
+      return '[]';
     }
   }
 
   @override
   void ngOnInit() {
     getData().then((res) {
-      print('Res = $res');
+      jsonDecode(res).forEach((instanceJson) {
+        print('Creating instance from \n$instanceJson');
+        instances.add(SeleniumInstance.fromJson(instanceJson));
+      });
     });
-
-//    HttpClient().getUrl(Uri.parse('//localhost:6969/api/getInstances?limit=3&skip=1')).then((request) {
-//      // sends the request
-////      request.close().then((response) {
-////        // transforms and prints the response
-////        response.transform(Utf8Decoder()).forEach((contents) {
-////          print(contents);
-////        });
-////      });
-//    });
   }
-
-//  void add() {
-//    SeleniumInstance.add(newTodo);
-//    newTodo = '';
-//  }
 }

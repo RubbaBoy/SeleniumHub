@@ -17,15 +17,18 @@ class SeleniumProxy extends RawRequestable {
     var body = await getBody(request);
 
     var seleniumUrl = request.uri.toString().replaceFirst('/selenium/', '');
-    print('Selenium URL: $seleniumUrl (Raw is: ${request.uri.toString()})');
     var contentType = [];
     var client = http.Client();
     http.Response response;
-    response = request.method.toLowerCase() == 'post'
+    var method = request.method.toLowerCase();
+    response = method == 'post'
         ? await client.post('http://127.0.0.1:4444/$seleniumUrl',
             headers: {'content-type': 'application/json'}, body: body)
+        : (method == 'delete'
+        ? await client.delete('http://127.0.0.1:4444/$seleniumUrl',
+            headers: {'content-type': 'application/json'})
         : await client.get('http://127.0.0.1:4444/$seleniumUrl',
-            headers: {'content-type': 'application/json'});
+            headers: {'content-type': 'application/json'}));
 
     var rawContentType = response.headers['content-type'] ?? 'text/plain';
     var jsonBody = response.body;
@@ -44,13 +47,13 @@ class SeleniumProxy extends RawRequestable {
     if (seleniumUrl == 'session') {
       var json = jsonDecode(jsonBody);
       var value = json['value'];
-      print(json);
       print('Created instance with session ID of ${json['sessionId']}');
 
       // TODO: Assuming chrome for now
       instanceManager.addInstance(SeleniumInstance(
           json['sessionId'],
           request.connectionInfo.remoteAddress.address,
+          true,
           value['browserName'],
           value['chrome']['chromedriverVersion'],
           value['chrome']['userDataDir'],

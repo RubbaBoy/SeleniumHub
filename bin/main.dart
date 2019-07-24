@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:mirrors';
@@ -73,4 +74,9 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
   request.response.close();
 }
 
-Future<void> main(List<String> args) async => await runServer(args.isNotEmpty ? args[0] : File(Platform.script.toFilePath()).parent.path);
+Future<void> main(List<String> args) async {
+  print('Grabbing initial instances...');
+  await instanceManager.initCurrentInstances();
+  print('Finished initializing initial instances');
+  await runServer(args.isNotEmpty ? args[0] : File(Platform.script.toFilePath()).parent.path);
+}
