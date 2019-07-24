@@ -50,6 +50,7 @@ class SeleniumProxy extends RawRequestable {
       // TODO: Assuming chrome for now
       instanceManager.addInstance(SeleniumInstance(
           json['sessionId'],
+          request.connectionInfo.remoteAddress.address,
           value['browserName'],
           value['chrome']['chromedriverVersion'],
           value['chrome']['userDataDir'],

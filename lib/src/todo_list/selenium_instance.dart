@@ -2,6 +2,7 @@ import 'package:uuid/uuid.dart';
 
 class SeleniumInstance {
   String sessionId;
+  String ip;
   String browserName;
   String driverVersion;
   String dataDir;
@@ -9,11 +10,12 @@ class SeleniumInstance {
   String platform;
   String version;
 
-  SeleniumInstance(this.sessionId, this.browserName, this.driverVersion,
+  SeleniumInstance(this.sessionId, this.ip, this.browserName, this.driverVersion,
       this.dataDir, this.debuggerAddress, this.platform, this.version);
 
   SeleniumInstance.fromJson(Map<String, dynamic> json)
       : sessionId = json['sessionId'],
+        ip = json['ip'],
         browserName = json['browserName'],
         driverVersion = json['driverVersion'],
         dataDir = json['dataDir'],
@@ -23,6 +25,7 @@ class SeleniumInstance {
 
   Map<String, dynamic> toJson() => {
         'sessionId': sessionId,
+        'ip': ip,
         'browserName': browserName,
         'driverVersion': driverVersion,
         'dataDir': dataDir,
