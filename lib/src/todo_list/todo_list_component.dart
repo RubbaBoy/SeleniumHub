@@ -1,9 +1,10 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
+import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
-
-import 'todo_list_service.dart';
 
 @Component(
   selector: 'todo-list',
@@ -17,25 +18,25 @@ import 'todo_list_service.dart';
     NgFor,
     NgIf,
   ],
-  providers: [ClassProvider(TodoListService)],
 )
 class TodoListComponent implements OnInit {
-  final TodoListService todoListService;
 
-  List<String> items = [];
-  String newTodo = '';
-
-  TodoListComponent(this.todoListService);
+  List<SeleniumInstance> instances = [];
 
   @override
   Future<Null> ngOnInit() async {
-    items = await todoListService.getTodoList();
+    var request = await HttpClient().getUrl(Uri.parse('//localhost:6969/api/getInstances?limit=3&skip=1'));
+    // sends the request
+    var response = await request.close();
+
+    // transforms and prints the response
+    await for (var contents in response.transform(Utf8Decoder())) {
+      print(contents);
+    }
   }
 
-  void add() {
-    items.add(newTodo);
-    newTodo = '';
-  }
-
-  String remove(int index) => items.removeAt(index);
+//  void add() {
+//    SeleniumInstance.add(newTodo);
+//    newTodo = '';
+//  }
 }

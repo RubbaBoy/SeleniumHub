@@ -20,8 +20,8 @@
 <div *ngIf="items.isNotEmpty">
   <ul>
       <li *ngFor="let item of items; let i=index">
-        <material-checkbox #done materialTooltip="Mark item as done">
-        </material-checkbox>
+<!--        <material-checkbox #done materialTooltip="Mark item as done">-->
+<!--        </material-checkbox>-->
         <span [class.done]="done.checked">{{item}}</span>
         <material-fab mini (trigger)="remove(i)">
           <material-icon icon="delete"></material-icon>

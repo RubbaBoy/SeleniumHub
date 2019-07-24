@@ -1,13 +1,16 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:mirrors';
 
 import 'package:mime/mime.dart';
 
-import 'Requestable.dart';
+import 'requestable.dart';
 import 'api.dart';
+import 'selenium_proxy.dart';
 
-Map<String, Requestable> DART_FILES = {
-  "api": API()
+Map<String, RawRequestable> DART_FILES = {
+  "api": API(),
+  "selenium": SeleniumProxy()
 };
 
 Future<void> runServer(String basePath) async {
@@ -18,9 +21,13 @@ Future<void> runServer(String basePath) async {
 }
 
 Future<void> handleRequest(String basePath, HttpRequest request) async {
-  final String path = request.uri.path;
-  final String resultPath = path == '/' || path == '\\' ? '\\index.html' : path;
-  final File file = File('$basePath$resultPath');
+  String path = request.uri.path;
+  String resultPath = path == '/' || path == '\\' ? '\\index.html' : path;
+  File file = File('$basePath$resultPath');
+  print(path);
+
+  var subs = path.replaceAll('\\', '/').split('/').where((str) => str.trim().isNotEmpty).map((str) => str.toLowerCase()).toList();
+  var dartFile = getDartFile(subs);
   if (await file.exists()) {
     try {
       var mime = lookupMimeType(resultPath);
@@ -34,30 +41,15 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
       print('Error happened: $exception');
       await sendInternalError(request.response);
     }
-  } else if (getDartFile(path) != null) {
-    var dartInstance = getDartFile(path);
-    var response = request.response
-      ..headers.contentType = dartInstance.getContentType();
-    await response.write(dartInstance.request(request.uri.queryParameters));
-    await response.close();
+  } else if (dartFile != null) {
+    await dartFile.requestRaw(request, subs.skip(1).toList());
   } else {
     await sendNotFound(request.response);
   }
 }
 
-Requestable getDartFile(String query) {
-  return DART_FILES[query.replaceFirst('\\', '').replaceFirst('/', '')];
-}
-
-Map<String, String> getQueryParams(HttpRequest request) {
-  var splitQuery = request.requestedUri.toString().split('?');
-  if (splitQuery.length == 1) return {};
-  var map = {};
-  splitQuery[0].split('&').forEach((kv) {
-    var kvSplit = kv.split('=');
-    map[kvSplit[0]] = kvSplit[1];
-  });
-  return map;
+RawRequestable getDartFile(List<String> query) {
+  return DART_FILES[query[0]];
 }
 
 Future<void> sendInternalError(HttpResponse response) async {
@@ -68,6 +60,14 @@ Future<void> sendInternalError(HttpResponse response) async {
 Future<void> sendNotFound(HttpResponse response) async {
   response.statusCode = HttpStatus.notFound;
   await response.close();
+}
+
+void setResponseCode(HttpRequest request, int code, {String message = ''}) {
+  request
+    ..headers.contentType = ContentType('application', 'json')
+    ..response.statusCode = code;
+  if (message.trim().isNotEmpty) request.response.write(message);
+  request.response.close();
 }
 
 Future<void> main(List<String> args) async => await runServer(args.isNotEmpty ? args[0] : File(Platform.script.toFilePath()).parent.path);
