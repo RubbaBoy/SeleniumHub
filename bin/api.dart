@@ -4,18 +4,21 @@ import 'dart:io';
 import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:uuid/uuid.dart';
 
+import 'instance_manager.dart';
 import 'requestable.dart';
 
 class API extends Requestable {
 
-  List<SeleniumInstance> _instances = [];
+  InstanceManager instanceManager;
   Uuid uuid = Uuid();
+
+  API(this.instanceManager);
 
   @override
   dynamic request(List<String> sub, Map<String, String> queryParams) {
     switch (sub[0]) {
       case 'getInstances':
-        return jsonEncode(_instances.map((instance) => instance.toJson()));
+        return jsonEncode(instanceManager.instances.map((instance) => instance.toJson()).toList());
       case 'addInstance':
         var thisUuid = uuid.v5(Uuid.NAMESPACE_URL, 'uddernetworks.com');
         var verify = verifyParameters(queryParams, ['ip']);

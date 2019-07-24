@@ -4,13 +4,16 @@ import 'dart:mirrors';
 
 import 'package:mime/mime.dart';
 
+import 'instance_manager.dart';
 import 'requestable.dart';
 import 'api.dart';
 import 'selenium_proxy.dart';
 
+InstanceManager instanceManager = InstanceManager();
+
 Map<String, RawRequestable> DART_FILES = {
-  "api": API(),
-  "selenium": SeleniumProxy()
+  "api": API(instanceManager),
+  "selenium": SeleniumProxy(instanceManager)
 };
 
 Future<void> runServer(String basePath) async {
@@ -26,7 +29,7 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
   File file = File('$basePath$resultPath');
   print(path);
 
-  var subs = path.replaceAll('\\', '/').split('/').where((str) => str.trim().isNotEmpty).map((str) => str.toLowerCase()).toList();
+  var subs = path.replaceAll('\\', '/').split('/').where((str) => str.trim().isNotEmpty).toList();
   var dartFile = getDartFile(subs);
   if (await file.exists()) {
     try {

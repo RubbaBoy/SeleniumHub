@@ -1,33 +1,33 @@
 import 'package:uuid/uuid.dart';
 
 class SeleniumInstance {
-  Uuid uuid;
-  String name;
-  String ip;
-  String port;
-  String computer;
-  String os;
-  String debugUrl;
+  String sessionId;
+  String browserName;
+  String driverVersion;
+  String dataDir;
+  String debuggerAddress;
+  String platform;
+  String version;
 
-  SeleniumInstance(
-      this.name, this.ip, this.port, this.computer, this.os, this.debugUrl);
+  SeleniumInstance(this.sessionId, this.browserName, this.driverVersion,
+      this.dataDir, this.debuggerAddress, this.platform, this.version);
 
   SeleniumInstance.fromJson(Map<String, dynamic> json)
-      : uuid = json['uuid'],
-        name = json['name'],
-        ip = json['ip'],
-        port = json['port'],
-        computer = json['computer'],
-        os = json['os'],
-        debugUrl = json['debugUrl'];
+      : sessionId = json['sessionId'],
+        browserName = json['browserName'],
+        driverVersion = json['driverVersion'],
+        dataDir = json['dataDir'],
+        debuggerAddress = json['debuggerAddress'],
+        platform = json['platform'],
+        version = json['version'];
 
   Map<String, dynamic> toJson() => {
-        'uuid': uuid,
-        'name': name,
-        'ip': ip,
-        'port': port,
-        'computer': computer,
-        'os': os,
-        'debugUrl': debugUrl
+        'sessionId': sessionId,
+        'browserName': browserName,
+        'driverVersion': driverVersion,
+        'dataDir': dataDir,
+        'debuggerAddress': debuggerAddress,
+        'platform': platform,
+        'version': version
       };
 }

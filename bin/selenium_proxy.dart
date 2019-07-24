@@ -1,76 +1,62 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
+import 'instance_manager.dart';
 import 'main.dart';
 import 'requestable.dart';
 
 class SeleniumProxy extends RawRequestable {
+  InstanceManager instanceManager;
+
+  SeleniumProxy(this.instanceManager);
 
   @override
   requestRaw(HttpRequest request, List<String> subs) async {
-//    if (subs.isEmpty || subs[0] != 'hub') {
-//      setResponseCode(request, 404);
-//      return;
-//    }
-
-  print('\n\n\n======================================================================== Dart received ========================================================================');
-  print('');
-
-    print('================== Selenium proxy ==================');
-    print('Sub = $subs');
-    print(request);
-    print(request.uri);
-    print(request.requestedUri.toString());
-    print(request.uri.queryParameters);
-
     var body = await getBody(request);
-    body = body.replaceAll('\n\r', '\n');
-    print('Body = $body');
-    print('Body type: ${body.runtimeType}');
 
-//    await request.response.close();
-
-    print('USING URI: ' + 'http://127.0.0.1:4444/${subs.join('/')}');
-
-
+    var seleniumUrl = request.uri.toString().replaceFirst('/selenium/', '');
+    print('Selenium URL: $seleniumUrl (Raw is: ${request.uri.toString()})');
     var contentType = [];
-    int statusCode = 200;
-    String respBody = '';
-
     var client = http.Client();
-    if (request.method.toLowerCase() == 'post') {
-      var seleniumResponse = await client.post(
-          'http://127.0.0.1:4444/${subs.join('/')}',
-          headers: {'content-type': 'application/json'},
-          body: body
-      );
+    http.Response response;
+    response = request.method.toLowerCase() == 'post'
+        ? await client.post('http://127.0.0.1:4444/$seleniumUrl',
+            headers: {'content-type': 'application/json'}, body: body)
+        : await client.get('http://127.0.0.1:4444/$seleniumUrl',
+            headers: {'content-type': 'application/json'});
 
-      print('================== RESPONSE ==================');
-      print('Headers: ${seleniumResponse.headers}');
-      print('Body: ${seleniumResponse.body}');
+    var rawContentType = response.headers['content-type'] ?? 'text/plain';
+    var jsonBody = response.body;
+    contentType = rawContentType?.split('/');
 
-      contentType = seleniumResponse.headers['content-type']?.split('/');
-      statusCode = seleniumResponse.statusCode;
-      respBody = seleniumResponse.body;
-    } else {
-      print('Sending exact ${'http://127.0.0.1:4444${request.uri.toString().replaceFirst('/selenium', '')}'}');
-      var seleniumResponse = await client.get(
-          'http://127.0.0.1:4444${request.uri.toString().replaceFirst('/selenium', '')}',
-          headers: {'content-type': 'application/json'}
-      );
-
-      contentType = seleniumResponse.headers['content-type']?.split('/');
-      statusCode = seleniumResponse.statusCode;
-      respBody = seleniumResponse.body;
-    }
+    print(jsonBody);
 
     var proxyResponse = request.response
       ..headers.contentType = ContentType(contentType[0], contentType[1])
-      ..statusCode = statusCode;
-    await proxyResponse.write(respBody);
+      ..statusCode = response.statusCode;
+    await proxyResponse.write(jsonBody);
     await proxyResponse.close();
 
+    ////////////// Hooks
+
+    if (seleniumUrl == 'session') {
+      var json = jsonDecode(jsonBody);
+      var value = json['value'];
+      print(json);
+      print('Created instance with session ID of ${json['sessionId']}');
+
+      // TODO: Assuming chrome for now
+      instanceManager.addInstance(SeleniumInstance(
+          json['sessionId'],
+          value['browserName'],
+          value['chrome']['chromedriverVersion'],
+          value['chrome']['userDataDir'],
+          value['goog:chromeOptions']['debuggerAddress'],
+          value['platform'],
+          value['version']));
+    }
 
     return;
   }
@@ -82,5 +68,4 @@ class SeleniumProxy extends RawRequestable {
     }
     return content;
   }
-
 }
