@@ -35,9 +35,11 @@ class InstanceManager {
 
   Future<String> getScreenshot(String id) async => jsonDecode((await client.get('http://localhost:4444/session/$id/screenshot')).body)['value'];
 
-  void updateScreenshot(SeleniumInstance instance, String base64) {
-    if (instance.screenshot != base64) {
+  // Other data *may* be mutable, but this is the data very often changed
+  void updateMutableData(SeleniumInstance instance, String base64, String url) {
+    if (instance.screenshot != base64 || instance.url != url) {
       instance.screenshot = base64;
+      instance.url = url;
       instance.refreshRevision();
     }
   }
@@ -89,8 +91,7 @@ class InstanceWatcher {
         _t.cancel();
         ifUnreachable();
       } else {
-        instance.url = await instanceManager.getUrl(instance.sessionId);
-        instanceManager.updateScreenshot(instance, await instanceManager.getScreenshot(instance.sessionId));
+        instanceManager.updateMutableData(instance, await instanceManager.getScreenshot(instance.sessionId), await instanceManager.getUrl(instance.sessionId));
       }
     });
   }

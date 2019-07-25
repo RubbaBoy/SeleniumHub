@@ -40,12 +40,17 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
         ..headers.contentType = contentType;
       await response.addStream(file.openRead());
       await response.close();
-    } catch (exception) {
-      print('Error happened: $exception');
+    } catch (e) {
+      print('Error happened: $e');
       await sendInternalError(request.response);
     }
   } else if (dartFile != null) {
-    await dartFile.requestRaw(request, subs.skip(1).toList());
+    try {
+      await dartFile.requestRaw(request, subs.skip(1).toList());
+    } catch (e) {
+      print('Error happened: $e');
+      await sendInternalError(request.response);
+    }
   } else {
     await sendNotFound(request.response);
   }

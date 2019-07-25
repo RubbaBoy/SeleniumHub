@@ -28,12 +28,25 @@ import 'package:clippy/browser.dart' as clippy;
     MaterialFabComponent,
     MaterialIconComponent,
     materialInputDirectives,
+    AutoDismissDirective,
+    AutoFocusDirective,
+    MaterialIconComponent,
+    MaterialButtonComponent,
+    MaterialTooltipDirective,
+    MaterialDialogComponent,
+    ModalComponent,
+    ModalComponent,
     NgFor,
     NgIf,
   ],
+  providers: [overlayBindings]
 )
 class TodoListComponent implements OnInit {
 
+  SeleniumInstance showingInfo;
+  bool showInfo = false;
+  bool showConfirmation = false;
+  String confirmingId;
   DomSanitizationService sanitizer;
   Set<SeleniumInstance> instances = Set();
 //  Map<String, String> currRevisions = {};
@@ -90,12 +103,10 @@ class TodoListComponent implements OnInit {
         instance.sessionId).join(',');
         var json = jsonDecode(await HttpRequest.getString(
             '//localhost:6969/api/getRevised?sessionIds=$revisedParam'));
-        json.forEach((json) {
-          var id = json['sessionId'];
-          var instance = getInst(id);
-          instance.revisionId = json['revisionId'];
-          instance.screenshot = json['screenshot'];
-        });
+        json.forEach((json) => getInst(json['sessionId'])
+            ..revisionId = json['revisionId']
+            ..screenshot = json['screenshot']
+            ..url = json['url']);
       }
 
       if (newIds.isNotEmpty) {
@@ -114,6 +125,35 @@ class TodoListComponent implements OnInit {
     Timer(Duration(seconds: 2), () => checkRevisions());
   }
 
+  void showStopConfirmation(SeleniumInstance instance) {
+    confirmingId = instance.sessionId;
+    showConfirmation = true;
+  }
+
+  void cancelStopConfirm() {
+    confirmingId = null;
+    showConfirmation = false;
+  }
+
+  void confirmStop() {
+    if (confirmingId == null) return;
+    showConfirmation = false;
+    print('User confirmed to stop $confirmingId');
+    HttpRequest.getString(
+        '//localhost:6969/api/stopInstances?sessionIds=$confirmingId');
+  }
+
+  void showInfoModal(SeleniumInstance instance) {
+    showInfo = true;
+    showingInfo = instance;
+    jsonEncode(instance.toJson());
+  }
+
+  String displayJson(SeleniumInstance instance) {
+    JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(showingInfo?.toJson() ?? {});
+  }
+
   String getIcon(String platform) {
     platform = platform.toLowerCase();
     if (platform.contains('windows')) return 'windows-icon';
@@ -129,9 +169,6 @@ class TodoListComponent implements OnInit {
 
   dynamic getURL(String url) => sanitizer.bypassSecurityTrustUrl(url);
 
-  void copy(String copy) {
-    print('Copying $copy');
-    clippy.write(copy);
-  }
+  void copy(String copy) => clippy.write(copy);
 
 }

@@ -38,6 +38,14 @@ li material-fab {
   text-decoration: line-through;
 }
 
+.info-json {
+  font-family: monospace, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.margined-button {
+  margin-top: 15px;
+}
+
 @import 'package:angular_components/css/material/material';
 
 //////////// Cards
