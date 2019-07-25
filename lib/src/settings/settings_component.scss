@@ -1,0 +1,59 @@
+:host {
+
+}
+
+.frame {
+  width: 100vw;
+  height: calc(100vh - 64px);
+  left: 0;
+  top: 64px;
+  position: absolute;
+  border: none;
+}
+
+.red {
+  background-color: #db4437;
+  color: white;
+}
+
+.blue {
+  background-color: #3f51b5;
+  color: white;
+  width: 80px;
+}
+
+.param-error {
+  color: #db4437;
+}
+
+
+.input-margin {
+  margin-left: 10px;
+}
+
+.setting-wrapper {
+  margin-bottom: 15px;
+}
+
+.setting-footer {
+  display: block;
+
+  span, material-button {
+    vertical-align: middle;
+    display: inline-block;
+  }
+
+  span {
+    margin-left: 25px;
+    transition: opacity 1s linear;
+    opacity: 0;
+  }
+
+  .save-status {
+     opacity: 1;
+   }
+
+  .save-error {
+    color: #db4437;
+  }
+}

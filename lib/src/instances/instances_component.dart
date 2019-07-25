@@ -3,11 +3,13 @@
 
 import 'dart:async';
 
+import 'package:SeleniumHub/src/inspector/inspector_component.dart';
+import 'package:SeleniumHub/src/settings/settings_component.dart';
 import 'package:angular/security.dart';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
+import 'package:SeleniumHub/src/instances/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_router/angular_router.dart';
@@ -15,6 +17,7 @@ import 'package:recase/recase.dart';
 import 'package:clippy/browser.dart' as clippy;
 
 import '../routes.dart';
+import '../settings.dart';
 
 @Component(
   selector: 'instances',
@@ -45,11 +48,14 @@ import '../routes.dart';
     routerDirectives,
     FocusListDirective,
     MaterialInputComponent,
+    InspectorComponent,
+    InstancesComponent,
+    SettingsComponent,
   ],
   providers: [overlayBindings],
   exports: [RoutePaths, Routes]
 )
-class TodoListComponent implements OnInit {
+class InstancesComponent implements OnInit {
 
   SeleniumInstance showingInfo;
   bool showInfo = false;
@@ -59,12 +65,12 @@ class TodoListComponent implements OnInit {
   Set<SeleniumInstance> instances = Set();
   SeleniumInstance inspectingInstance;
   List<Map<String, dynamic>> inspectWindows = [];
+  Settings settings;
 //  Map<String, String> currRevisions = {};
 
-  final Router _router;
   final DomSanitizationService sanitizer;
 
-  TodoListComponent(this.sanitizer, this._router);
+  InstancesComponent(this.sanitizer);
 
   Future<String> getData() async {
     var path = '//localhost:6969/api/getInstances';
@@ -89,7 +95,9 @@ class TodoListComponent implements OnInit {
   }
 
   @override
-  void ngOnInit() {
+  Future ngOnInit() async {
+    var json = await HttpRequest.getString('//localhost:6969/api/getSettings');
+    settings = Settings.fromJson(jsonDecode(json));
     checkRevisions();
   }
 
@@ -111,7 +119,7 @@ class TodoListComponent implements OnInit {
         ..removeWhere((id) => _tempIds.contains(id));
 //      print('Revision ids: ${revisions.keys}\tTemp ids: $_tempIds\tFinal: $newIds');
 
-      if (updateScreenshotIds.isNotEmpty) {
+      if (settings.updateScreenshots && updateScreenshotIds.isNotEmpty) {
         var revisedParam = updateScreenshotIds.map((instance) =>
         instance.sessionId).join(',');
         var json = jsonDecode(await HttpRequest.getString(
@@ -135,7 +143,7 @@ class TodoListComponent implements OnInit {
       print(e);
     }
 
-    Timer(Duration(seconds: 2), () => checkRevisions());
+    Timer(Duration(seconds: settings.screenshotInterval), () => checkRevisions());
   }
 
   void showStopConfirmation(SeleniumInstance instance) {

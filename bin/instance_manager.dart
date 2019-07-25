@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
+import 'package:SeleniumHub/src/instances/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
 class InstanceManager {

@@ -22,12 +22,12 @@ dependencies:
   shelf_web_socket: ^0.2.3
   angular_forms: ^2.1.2
   angular_router: ^2.0.0-alpha+22
+  angular: ^5.3.1
 
 dev_dependencies:
   build_runner: ^1.6.2
   build_web_compilers: ^2.1.4
   angular_components: ^0.13.0+1
-  angular: ^5.3.1
   sass_builder: ^2.1.2
 
 transformers:

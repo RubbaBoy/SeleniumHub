@@ -1,0 +1,24 @@
+<h1 class="instances-title">Settings</h1>
+<div class="controls">
+
+    <div class="setting-wrapper">
+        <material-toggle [disabled]="false" label="Enable screenshot update"
+                         [(checked)]="updateScreenshots">
+        </material-toggle>
+    </div>
+
+    <div class="setting-wrapper">
+        Screenshot Interval (ms)
+        <material-input type="number"
+                        keypressUpdate
+                        [(ngModel)]="screenshotInterval"
+                        class="input-margin"
+                        (keyup.enter)="saveConfig()">
+        </material-input>
+    </div>
+
+    <div class="setting-footer">
+        <material-button clear-size (trigger)="saveConfig()" class="blue save">Save</material-button>
+        <span id="setting-save-status" [class.save-status]="showStatus" [class.save-error]="isError">{{ saveStatus }}</span>
+    </div>
+</div>

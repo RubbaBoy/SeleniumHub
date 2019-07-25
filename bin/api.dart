@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
+import 'package:SeleniumHub/src/settings.dart';
+import 'package:SeleniumHub/src/instances/selenium_instance.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
@@ -57,6 +58,27 @@ class API extends Requestable {
         var instance = instanceManager.getInstance(id);
         if (instance == null) return {'message': 'Unknown sessionId: $id'};
         return (await client.get('http://${instance.debuggerAddress}/json/list')).body;
+      case 'getSettings':
+        String settingsFile = '';
+        try {
+          settingsFile = await File('settings.json').readAsString();
+        } catch (e) {
+          print(e);
+        }
+        return Settings.fromJson(jsonDecode(settingsFile)).toJson();
+      case 'setSettings':
+        // This is for lazy setting validation
+        var value = queryParams['value'];
+        if (value == null) return {'message': 'Required query parameter: value'};
+        var settings = Settings.fromJson(jsonDecode(value));
+        try {
+          await File('settings.json').writeAsString(
+              jsonEncode(settings.toJson()));
+          print('Writing: ${jsonEncode(settings.toJson())}');
+        } catch (e) {
+          return {'message': 'An error occured. Here are the details: $e'};
+        }
+        return {'message': 'Successfully wrote to settings'};
       default:
         return {'message': 'unknown endpoint "${sub[0]}"'};
     }

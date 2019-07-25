@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
+import 'dart:typed_data';
+import 'package:SeleniumHub/src/instances/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
 import 'instance_manager.dart';
@@ -14,7 +16,7 @@ class SeleniumProxy extends RawRequestable {
 
   @override
   requestRaw(HttpRequest request, List<String> subs) async {
-    var body = await getBody(request);
+    var body = UIntStuffToString(request);
 
     var seleniumUrl = request.uri.toString().replaceFirst('/selenium/', '');
     var client = http.Client();
@@ -60,11 +62,24 @@ class SeleniumProxy extends RawRequestable {
     }
   }
 
-  Future<String> getBody(HttpRequest request) async {
-    var content = "";
-    await for (var contents in request.transform(Utf8Decoder())) {
-      content += contents;
-    }
-    return content;
+  static String UIntStuffToString(HttpRequest request) {
+    StringBuffer buffer = StringBuffer();
+    request.forEach((bytes) {
+      for (int i = 0; i < bytes.length;) {
+        int firstWord = (bytes[i] << 8) + bytes[i + 1];
+        if (0xD800 <= firstWord && firstWord <= 0xDBFF) {
+          int secondWord = (bytes[i + 2] << 8) + bytes[i + 3];
+          buffer.writeCharCode(
+              ((firstWord - 0xD800) << 10) + (secondWord - 0xDC00) + 0x10000);
+          i += 4;
+        }
+        else {
+          buffer.writeCharCode(firstWord);
+          i += 2;
+        }
+      }
+    });
+    return buffer.toString();
   }
+
 }

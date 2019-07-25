@@ -2,8 +2,14 @@
     <material-list *deferredContent>
         <div group class="mat-drawer-spacer"></div>
         <div group>
-           <material-list-item (trigger)="routeTo('#')">
-               <material-icon icon="inbox"></material-icon>Instances
+           <material-list-item (trigger)="locationTo('/#')">
+               <material-icon icon="settings_ethernet"></material-icon>Connect
+           </material-list-item>
+           <material-list-item (trigger)="locationTo('/#')">
+               <material-icon icon="dashboard"></material-icon>Instances
+           </material-list-item>
+           <material-list-item (trigger)="routeTo('/#/settings')">
+               <material-icon icon="settings"></material-icon>Settings
            </material-list-item>
         </div>
     </material-list>
@@ -16,9 +22,9 @@
             </material-button>
             <span class="material-header-title">Selenium Hub</span>
             <div class="material-spacer"></div>
-<!--            <nav class="material-navigation">-->
-<!--                <a>Instances</a>-->
-<!--            </nav>-->
+            <nav class="material-navigation">
+                <a href="https://github.com/RubbaBoy/SeleniumHub">GitHub</a>
+            </nav>
         </div>
     </header>
     <div class="inner-content">

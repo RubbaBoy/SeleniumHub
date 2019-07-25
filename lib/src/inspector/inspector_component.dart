@@ -3,11 +3,13 @@
 
 import 'dart:async';
 
+import 'package:SeleniumHub/src/instances/instances_component.dart';
+import 'package:SeleniumHub/src/settings/settings_component.dart';
 import 'package:angular/security.dart';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
+import 'package:SeleniumHub/src/instances/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_router/angular_router.dart';
@@ -41,27 +43,27 @@ import '../routes.dart';
     ModalComponent,
     NgFor,
     NgIf,
-    routerDirectives
+    routerDirectives,
+    InspectorComponent,
+    InstancesComponent,
+    SettingsComponent,
   ],
   providers: [overlayBindings],
   exports: [RoutePaths, Routes]
 )
-class TodoListComponent implements OnInit {
+class InspectorComponent implements OnInit {
 
-  DomSanitizationService sanitizer;
+  final DomSanitizationService sanitizer;
   bool invalidParams = false;
   SafeValue safeIFrame;
 
   set iFrameLink(String url) => safeIFrame = sanitizer.bypassSecurityTrustResourceUrl(url);
 
-  TodoListComponent(this.sanitizer);
+  InspectorComponent(this.sanitizer);
 
   @override
   void ngOnInit() {
-    print('Split: ${Uri.base.toString().split('?')}');
-    print('Split: ${Uri.base.toString().split('?')[1]}');
     var params = Uri.splitQueryString(Uri.base.toString().split('?')[1]);
-    print('Params = $params');
     var sessionId = params['sessionId'] ?? '';
     var page = params['page'] ?? '';
     if (sessionId.length != 32 || page.length != 32) {
