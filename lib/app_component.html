@@ -1,7 +1,12 @@
 <material-drawer temporary #drawer="drawer">
-    <div *deferredContent>
-        Here is some drawer content.
-    </div>
+    <material-list *deferredContent>
+        <div group class="mat-drawer-spacer"></div>
+        <div group>
+           <material-list-item (trigger)="routeTo('#')">
+               <material-icon icon="inbox"></material-icon>Instances
+           </material-list-item>
+        </div>
+    </material-list>
 </material-drawer>
 <div class="material-content">
     <header class="material-header shadow">
@@ -17,9 +22,6 @@
         </div>
     </header>
     <div class="inner-content">
-        <h1 class="instances-title">Instances</h1>
-        <div class="controls">
-            <todo-list></todo-list>
-        </div>
+        <router-outlet [routes]="Routes.all"></router-outlet>
     </div>
 </div>

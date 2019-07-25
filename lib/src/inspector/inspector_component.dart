@@ -10,13 +10,16 @@ import 'dart:html';
 import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
+import 'package:angular_router/angular_router.dart';
 import 'package:recase/recase.dart';
 import 'package:clippy/browser.dart' as clippy;
 
+import '../routes.dart';
+
 @Component(
-  selector: 'todo-list',
+  selector: 'inspector',
   styleUrls: [
-    'todo_list_component.css',
+    'inspector_component.css',
     'package:angular_components/css/mdc_web/card/mdc-card.scss.css',
     'package:angular_components/app_layout/layout.scss.css',
   ],
@@ -38,136 +41,36 @@ import 'package:clippy/browser.dart' as clippy;
     ModalComponent,
     NgFor,
     NgIf,
+    routerDirectives
   ],
-  providers: [overlayBindings]
+  providers: [overlayBindings],
+  exports: [RoutePaths, Routes]
 )
 class TodoListComponent implements OnInit {
 
-  SeleniumInstance showingInfo;
-  bool showInfo = false;
-  bool showConfirmation = false;
-  String confirmingId;
   DomSanitizationService sanitizer;
-  Set<SeleniumInstance> instances = Set();
-//  Map<String, String> currRevisions = {};
+  bool invalidParams = false;
+  SafeValue safeIFrame;
+
+  set iFrameLink(String url) => safeIFrame = sanitizer.bypassSecurityTrustResourceUrl(url);
 
   TodoListComponent(this.sanitizer);
 
-  Future<String> getData() async {
-    var path = '//localhost:6969/api/getInstances';
-    try {
-      return await HttpRequest.getString(path);
-    } catch (e) {
-      print('Couldn\'t open $path');
-      return '[]';
-    }
-  }
-
-  Future<Map<String, String>> getRevisions() async {
-    try {
-      var json = await HttpRequest.getString('//localhost:6969/api/getRevisions');
-      Map<String, String> result = {};
-      jsonDecode(json).forEach((json) => result[json['sessionId']] = json['revisionId']);
-      return result;
-    } catch (e) {
-      print('Couldn\'t open');
-      return {};
-    }
-  }
-
   @override
   void ngOnInit() {
-    checkRevisions();
-  }
-
-  void checkRevisions() async {
-    try {
-      var revisions = await getRevisions();
-
-      // If current has revisions the server doesn't have, remove it
-      instances.removeWhere((instance) =>
-      !revisions.containsKey(instance.sessionId));
-
-      // If the current revisions are different than the existing ones, add them to a list to update their screenshot
-      var updateScreenshotIds = instances.where((instance) =>
-      instance.revisionId != revisions[instance.sessionId]).toList();
-
-      // If the server's revisions have IDs the current list doesn't have, add them to a list to be added
-      var _tempIds = instances.map((instance) => instance.sessionId);
-      var newIds = List.from(revisions.keys)
-        ..removeWhere((id) => _tempIds.contains(id));
-//      print('Revision ids: ${revisions.keys}\tTemp ids: $_tempIds\tFinal: $newIds');
-
-      if (updateScreenshotIds.isNotEmpty) {
-        var revisedParam = updateScreenshotIds.map((instance) =>
-        instance.sessionId).join(',');
-        var json = jsonDecode(await HttpRequest.getString(
-            '//localhost:6969/api/getRevised?sessionIds=$revisedParam'));
-        json.forEach((json) => getInst(json['sessionId'])
-            ..revisionId = json['revisionId']
-            ..screenshot = json['screenshot']
-            ..url = json['url']);
-      }
-
-      if (newIds.isNotEmpty) {
-        var revisedParam = newIds.join(',');
-        var json = jsonDecode(await HttpRequest.getString(
-            '//localhost:6969/api/getInstances?sessionIds=$revisedParam'));
-        json.forEach((json) {
-          instances.add(SeleniumInstance.fromJson(json));
-          print('New instance ${json['sessionId']}');
-        });
-      }
-    } catch (e) {
-      print(e);
+    print('Split: ${Uri.base.toString().split('?')}');
+    print('Split: ${Uri.base.toString().split('?')[1]}');
+    var params = Uri.splitQueryString(Uri.base.toString().split('?')[1]);
+    print('Params = $params');
+    var sessionId = params['sessionId'] ?? '';
+    var page = params['page'] ?? '';
+    if (sessionId.length != 32 || page.length != 32) {
+      invalidParams = true;
+      return;
     }
 
-    Timer(Duration(seconds: 2), () => checkRevisions());
+    iFrameLink = 'http://localhost:6969/devtools/$sessionId/inspector.html?ws=localhost:6970/devtools/$sessionId/page/$page';
   }
-
-  void showStopConfirmation(SeleniumInstance instance) {
-    confirmingId = instance.sessionId;
-    showConfirmation = true;
-  }
-
-  void cancelStopConfirm() {
-    confirmingId = null;
-    showConfirmation = false;
-  }
-
-  void confirmStop() {
-    if (confirmingId == null) return;
-    showConfirmation = false;
-    print('User confirmed to stop $confirmingId');
-    HttpRequest.getString(
-        '//localhost:6969/api/stopInstances?sessionIds=$confirmingId');
-  }
-
-  void showInfoModal(SeleniumInstance instance) {
-    showInfo = true;
-    showingInfo = instance;
-    jsonEncode(instance.toJson());
-  }
-
-  String displayJson(SeleniumInstance instance) {
-    JsonEncoder encoder = JsonEncoder.withIndent('  ');
-    return encoder.convert(showingInfo?.toJson() ?? {});
-  }
-
-  String getIcon(String platform) {
-    platform = platform.toLowerCase();
-    if (platform.contains('windows')) return 'windows-icon';
-    if (platform.contains('mac') || platform.contains('osx')) return 'mac-icon';
-    return 'linux-icon';
-  }
-
-  SeleniumInstance getInst(String id) => instances.firstWhere((instance) => instance.sessionId == id);
-
-  String camelCase(String input) => ReCase(input).titleCase;
-
-  dynamic getBackgroundFor(String screenshot) => sanitizer.bypassSecurityTrustStyle('background-image: url(data:image/png;base64,$screenshot)');
-
-  dynamic getURL(String url) => sanitizer.bypassSecurityTrustUrl(url);
 
   void copy(String copy) => clippy.write(copy);
 

@@ -71,7 +71,7 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
 }
 
 RawRequestable getDartFile(List<String> query) {
-  return DART_FILES[query[0]];
+  return query.isEmpty ? null : DART_FILES[query[0]];
 }
 
 Future<void> sendInternalError(HttpResponse response) async {

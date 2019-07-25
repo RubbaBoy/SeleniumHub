@@ -1,6 +1,6 @@
-:host {
 
-}
+@import 'package:angular_components/material_expansionpanel/mixins';
+@import 'package:angular_components/material_yes_no_buttons/mixins';
 
 .red {
   background-color: #db4437;
@@ -44,6 +44,10 @@ li material-fab {
 
 .margined-button {
   margin-top: 15px;
+}
+
+.inspectSection {
+  margin: 25px 0;
 }
 
 @import 'package:angular_components/css/material/material';
@@ -100,7 +104,50 @@ section {
   margin: 0 20px;
 }
 
-//////// OS Icons
+.custom-toolbelt-buttons {
+  @include material-yes-button-text-color($mat-blue);
+  margin-left: 10px;
+}
+
+.inspect-dialog {
+  width: 800px;
+}
+
+.inspectSection {
+  width: 100%;
+}
+
+.inspect-list {
+  .text-holder {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .favicon {
+      width: 24px;
+      height: 24px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .url {
+      display: inline-block;
+      margin-left: 10px;
+    }
+
+    .type {
+      margin-left: 10px;
+      margin-top: 5px;
+      display: block;
+    }
+  }
+}
+
+.hide-favicon {
+  display: none;
+}
+
+  //////// OS Icons
 
 .os-icon {
   display: inline-block;

@@ -1,0 +1,104 @@
+<h1 class="instances-title">Instances</h1>
+<div class="controls">
+    <p *ngIf="instances.isEmpty">
+        No instances found!
+    </p>
+
+    <modal [(visible)]="showConfirmation">
+        <material-dialog class="basic-dialog">
+            <h1 header>Are you sure you want to stop this instance?</h1>
+
+            <p>
+                Stopping the instance may cause unforseen problems in the controller program, and all data in the
+                browser instance will be lost. This is a non recoverable action.
+            </p>
+
+            <div footer>
+                <material-button clear-size (trigger)="cancelStopConfirm()">Close</material-button>
+                <material-button raised class="red" (trigger)="confirmStop()">Stop</material-button>
+            </div>
+
+        </material-dialog>
+    </modal>
+
+    <modal [(visible)]="showInfo">
+        <material-dialog class="basic-dialog">
+            <h1 header>Info for {{ showingInfo?.sessionId }}</h1>
+
+            <pre class="info-json">{{ displayJson(showingInfo) }}</pre>
+
+            <div footer class="margined-button">
+                <material-button clear-size (trigger)="showInfo = false">Close</material-button>
+            </div>
+        </material-dialog>
+    </modal>
+
+    <modal [(visible)]="showInspectChooser">
+        <material-dialog class="basic-dialog inspect-dialog">
+            <h1 header>Choose window to inspect for {{ showingInfo?.sessionId }}</h1>
+
+            <div *ngIf="inspectWindows.isEmpty">
+                <p>No inspect windows available</p>
+            </div>
+
+            <div *ngIf="inspectWindows.isNotEmpty" class="card-container">
+                <section class="inspectSection">
+                    <div *ngFor="let inspect of inspectWindows; let i=index">
+                        <material-expansionpanel
+                                autoDismissable
+                                [showSaveCancel]="false"
+                                name="{{ inspect['title'] }}"
+                                class="inspect-list">
+
+                            <div class="text-holder">
+                                <img src="{{ getURL(inspect['faviconUrl']) }}" [class.hide-favicon]="inspect['faviconUrl'] == null" alt="favicon" class="favicon"/>
+                                <a class="url" href="{{ inspect['url'] }}">{{ inspect['url'] }}</a>
+                                <span class="type">Type: {{ inspect['type'] }}</span>
+                            </div>
+
+                            <div toolbelt>
+                                <material-yes-no-buttons class="custom-toolbelt-buttons"
+                                                         yesText="Inspect"
+                                                         noText="Cancel"
+                                                         (yes)="inspectWindow(inspect)"
+                                                         (no)="showInspectChooser = false">
+                                </material-yes-no-buttons>
+                            </div>
+                        </material-expansionpanel>
+                    </div>
+                </section>
+            </div>
+
+            <div footer class="margined-button">
+                <material-button clear-size (trigger)="showInspectChooser = false">Close</material-button>
+            </div>
+        </material-dialog>
+    </modal>
+
+    <div *ngIf="instances.isNotEmpty" class="card-container">
+        <div *ngFor="let instance of instances; let i=index">
+            <div class="mdc-card instance-size">
+                <div class="mdc-card__media mdc-card__media--16-9" style="{{ getBackgroundFor(instance.screenshot) }}"></div>
+                <div class="instance-card-primary">
+                    <h2 class="instance-title" title="Click to copy" (click)="copy(instance.sessionId)">{{
+                        instance.sessionId }}</h2>
+                    <h3 class="instance-subtitle"><span class="os-icon {{ getIcon(instance.platform) }}"></span>{{
+                        camelCase(instance.browserName) }} @ {{ instance.ip }}</h3>
+                </div>
+                <div class="instance-card-secondary">
+                    <a href="{{ getURL(instance.url) }}" target="_blank">{{ instance.url }}</a>
+                </div>
+                <div class="mdc-card__actions">
+                    <div class="mdc-card__action-buttons">
+                        <material-button (trigger)="showInfoModal(instance)">Info</material-button>
+                        <material-button (trigger)="openInspectChooser(instance)">Inspect</material-button>
+                    </div>
+                    <div class="mdc-card__action-icons">
+                        <material-button raised class="red" (trigger)="showStopConfirmation(instance)">Stop
+                        </material-button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

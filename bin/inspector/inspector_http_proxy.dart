@@ -19,13 +19,13 @@ class InspectorHttpProxy extends Requestable {
     int port = instanceManager.getPort(instance);
     print('Using port: $port');
 
-    String path = request.uri.path;
     var proxyUrl = 'http://localhost:$port${request.uri.toString().replaceFirst('/devtools/${sub[0]}', '/devtools')}';
     print('Requesting path: $proxyUrl');
 
     var response = await client.get(proxyUrl);
     var rawContentType = response.headers['content-type'] ?? 'text/plain';
 
+    request.response.headers.set('X-Frame-Options', 'allow-from: localhost');
     return [response.body, ContentType.parse(rawContentType)];
   }
 

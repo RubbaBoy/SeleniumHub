@@ -1,59 +1,9 @@
-<p *ngIf="instances.isEmpty">
-    No instances found!
-</p>
-
-<modal [(visible)]="showConfirmation">
-    <material-dialog class="basic-dialog">
-        <h1 header>Are you sure you want to stop this instance?</h1>
-
-        <p>
-            Stopping the instance may cause unforseen problems in the controller program, and all data in the browser
-            instance will be lost. This is a non recoverable action.
-        </p>
-
-        <div footer>
-            <material-button clear-size (trigger)="cancelStopConfirm()">Close</material-button>
-            <material-button raised class="red" (trigger)="confirmStop()">Stop</material-button>
-        </div>
-
-    </material-dialog>
-</modal>
-
-<modal [(visible)]="showInfo">
-    <material-dialog class="basic-dialog">
-        <h1 header>Info for {{ showingInfo?.sessionId }}</h1>
-
-        <pre class="info-json">{{ displayJson(showingInfo) }}</pre>
-
-        <div footer class="margined-button">
-            <material-button clear-size (trigger)="showInfo = false">Close</material-button>
-        </div>
-    </material-dialog>
-</modal>
-
-<div *ngIf="instances.isNotEmpty" class="card-container">
-    <div *ngFor="let instance of instances; let i=index">
-        <div class="mdc-card instance-size">
-            <div class="mdc-card__media mdc-card__media--16-9" style="{{ getBackgroundFor(instance.screenshot) }}"></div>
-            <div class="instance-card-primary">
-                <h2 class="instance-title" title="Click to copy" (click)="copy(instance.sessionId)">{{
-                    instance.sessionId }}</h2>
-                <h3 class="instance-subtitle"><span class="os-icon {{ getIcon(instance.platform) }}"></span>{{
-                    camelCase(instance.browserName) }} @ {{ instance.ip }}</h3>
-            </div>
-            <div class="instance-card-secondary">
-                <a href="{{ getURL(instance.url) }}" target="_blank">{{ instance.url }}</a>
-            </div>
-            <div class="mdc-card__actions">
-                <div class="mdc-card__action-buttons">
-                    <material-button (trigger)="showInfoModal(instance)">Info</material-button>
-                    <material-button>Inspect</material-button>
-                </div>
-                <div class="mdc-card__action-icons">
-                    <material-button raised class="red" (trigger)="showStopConfirmation(instance)">Stop
-                    </material-button>
-                </div>
-            </div>
-        </div>
+<h1 class="instances-title">Inspector</h1>
+<div class="controls">
+    <div *ngIf="invalidParams">
+        <h2 class="param-error">Error: Invalid URL parameters.</h2>
+    </div>
+    <div *ngIf="!invalidParams">
+        <iframe [src]="safeIFrame" class="frame"></iframe>
     </div>
 </div>

@@ -10,36 +10,44 @@ import 'dart:html';
 import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
+import 'package:angular_router/angular_router.dart';
 import 'package:recase/recase.dart';
 import 'package:clippy/browser.dart' as clippy;
 
+import '../routes.dart';
+
 @Component(
-  selector: 'todo-list',
+  selector: 'instances',
   styleUrls: [
-    'todo_list_component.css',
+    'instances_component.css',
     'package:angular_components/css/mdc_web/card/mdc-card.scss.css',
     'package:angular_components/app_layout/layout.scss.css',
   ],
-  templateUrl: 'todo_list_component.html',
+  templateUrl: 'instances_component.html',
   directives: [
     MaterialButtonComponent,
     MaterialIconComponent,
     MaterialCheckboxComponent,
     MaterialFabComponent,
-    MaterialIconComponent,
     materialInputDirectives,
     AutoDismissDirective,
     AutoFocusDirective,
-    MaterialIconComponent,
-    MaterialButtonComponent,
     MaterialTooltipDirective,
     MaterialDialogComponent,
     ModalComponent,
-    ModalComponent,
+    MaterialExpansionPanel,
+    MaterialExpansionPanelAutoDismiss,
+    MaterialExpansionPanelSet,
+    MaterialYesNoButtonsComponent,
     NgFor,
     NgIf,
+    NgModel,
+    routerDirectives,
+    FocusListDirective,
+    MaterialInputComponent,
   ],
-  providers: [overlayBindings]
+  providers: [overlayBindings],
+  exports: [RoutePaths, Routes]
 )
 class TodoListComponent implements OnInit {
 
@@ -48,12 +56,15 @@ class TodoListComponent implements OnInit {
   bool showConfirmation = false;
   bool showInspectChooser = false;
   String confirmingId;
-  DomSanitizationService sanitizer;
   Set<SeleniumInstance> instances = Set();
+  SeleniumInstance inspectingInstance;
   List<Map<String, dynamic>> inspectWindows = [];
 //  Map<String, String> currRevisions = {};
 
-  TodoListComponent(this.sanitizer);
+  final Router _router;
+  final DomSanitizationService sanitizer;
+
+  TodoListComponent(this.sanitizer, this._router);
 
   Future<String> getData() async {
     var path = '//localhost:6969/api/getInstances';
@@ -166,7 +177,11 @@ class TodoListComponent implements OnInit {
   void openInspectChooser(SeleniumInstance instance) {
     HttpRequest.getString(
         '//localhost:6969/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
-          inspectWindows = jsonDecode(response);
+          print('Response: $response');
+          inspectWindows.clear();
+          inspectingInstance = instance;
+          jsonDecode(response).forEach((dyn) => inspectWindows.add(dyn as Map<String, dynamic>));
+          print(inspectWindows);
           showInspectChooser = true;
     });
   }
@@ -175,7 +190,9 @@ class TodoListComponent implements OnInit {
     showInspectChooser = false;
     print('Inspecting ${inspect['title']}');
 
-    // inspects something from inspectWindows
+    var inspector = '/#${RoutePaths.inspector.toUrl()}?sessionId=${inspectingInstance.sessionId}&page=${inspect['id']}';
+    print('Inspecting to: $inspector');
+    window.location.assign(inspector);
   }
 
   SeleniumInstance getInst(String id) => instances.firstWhere((instance) => instance.sessionId == id);
