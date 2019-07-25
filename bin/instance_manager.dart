@@ -5,23 +5,50 @@ import 'package:SeleniumHub/src/todo_list/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
 class InstanceManager {
-
   var client = http.Client();
   List<SeleniumInstance> instances = [];
   List<InstanceWatcher> watchers = [];
 
-  void addInstance(SeleniumInstance instance) => instances.add(instance);
+  void addInstance(SeleniumInstance instance) {
+    instances.add(instance);
+    addWatcher(instance);
+  }
 
-  void removeInstance(SeleniumInstance instance) => instances.remove(instance);
+  void addWatcher(SeleniumInstance instance) =>
+      watchers.add(InstanceWatcher(instance)..start(this, () => deleteInstance(instance.sessionId)));
 
-  void addWatcher(String id) => watchers.add(InstanceWatcher(id)..start(() => deleteInstance(id)));
+  void removeWatcher(SeleniumInstance instance) {
+    watchers.where((watcher) => watcher.instance == instance).toList().forEach((watcher) {
+      watcher.stop();
+      watchers.remove(watcher);
+    });
+  }
 
-  void deleteInstance(String id) => client.delete('http://localhost:4444/session/$id');
+  void deleteInstance(String id) {
+    client.delete('http://localhost:4444/session/$id');
+    var instance = instances.firstWhere((instance) => instance.sessionId == id, orElse: () => null);
+    if (instance != null) {
+      removeWatcher(instance);
+      instances.remove(instance);
+    }
+  }
+
+  Future<String> getScreenshot(String id) async => jsonDecode((await client.get('http://localhost:4444/session/$id/screenshot')).body)['value'];
+
+  void updateScreenshot(SeleniumInstance instance, String base64) {
+    if (instance.screenshot != base64) {
+      instance.screenshot = base64;
+      instance.refreshRevision();
+    }
+  }
+
+  Future<String> getUrl(String id) => client
+        .get('http://localhost:4444/session/$id/url')
+        .then((response) => jsonDecode(response.body)['value']);
 
   Future<void> initCurrentInstances() async {
     var response = await client.get('http://localhost:4444/sessions');
     var values = jsonDecode(response.body)['value'];
-    print(values);
     for (var value in values) {
       Map<String, dynamic> current = value['capabilities'];
       var id = value['id'];
@@ -32,37 +59,45 @@ class InstanceManager {
       }
 
       print('Added $id');
-      addInstance(SeleniumInstance(
+      var instance = SeleniumInstance(
           id,
-          'unknown',
-          true,
-         current['browserName'],
-         current['chrome']['chromedriverVersion'],
-         current['chrome']['userDataDir'],
-         current['goog:chromeOptions']['debuggerAddress'],
-         current['platform'],
-         current['version']));
+          '0.0.0.0',
+          current['browserName'],
+          current['chrome']['chromedriverVersion'],
+          current['chrome']['userDataDir'],
+          current['goog:chromeOptions']['debuggerAddress'],
+          current['platform'],
+          current['version'],
+          await getScreenshot(id),
+          await getUrl(id));
+      addInstance(instance);
     }
   }
 }
 
 class InstanceWatcher {
-
   static var client = http.Client();
-  String id;
+  SeleniumInstance instance;
   Timer timer;
 
-  InstanceWatcher(this.id);
+  InstanceWatcher(this.instance);
 
-  void start(void ifUnreachable()) {
+  void start(InstanceManager instanceManager, void ifUnreachable()) {
     timer = Timer.periodic(Duration(seconds: 2), (_t) async {
-      bool connectable = await canConnect(id);
+      bool connectable = await canConnect(instance.sessionId);
       if (!connectable) {
         _t.cancel();
         ifUnreachable();
+      } else {
+        instance.url = await instanceManager.getUrl(instance.sessionId);
+        instanceManager.updateScreenshot(instance, await instanceManager.getScreenshot(instance.sessionId));
       }
     });
   }
 
-  static Future<bool> canConnect(String id) => client.get('http://localhost:4444/session/$id/url').then((response) => jsonDecode(response.body)['status'] != 100);
+  void stop() => timer.cancel();
+
+  static Future<bool> canConnect(String id) => client
+        .get('http://localhost:4444/session/$id/url')
+        .then((response) => jsonDecode(response.body)['status'] == 0);
 }

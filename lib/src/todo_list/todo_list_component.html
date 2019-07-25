@@ -1,53 +1,28 @@
-<!-- Components info: https://webdev.dartlang.org/components -->
-<!--<div>-->
-<!--  <material-input label="What do you need to do?"-->
-<!--                  autoFocus floatingLabel style="width:80%"-->
-<!--                  [(ngModel)]="newTodo"-->
-<!--                  (keyup.enter)="add()">-->
-<!--  </material-input>-->
+<p *ngIf="instances.isEmpty">
+    No instances found!
+</p>
 
-<!--  <material-fab mini raised-->
-<!--                (trigger)="add()"-->
-<!--                [disabled]="newTodo.isEmpty">-->
-<!--    <material-icon icon="add"></material-icon>-->
-<!--  </material-fab>-->
-<!--</div>-->
-
-<!--<p *ngIf="instances.isEmpty">-->
-<!--  Nothing to do! Add items above.-->
-<!--</p>-->
-
-<!--<div *ngIf="instances.isNotEmpty">-->
-<!--  <ul>-->
-<!--      <li *ngFor="let item of items; let i=index">-->
-<!--        <material-checkbox #done materialTooltip="Mark item as done">-->
-<!--        </material-checkbox>-->
-<!--        <span [class.done]="done.checked">{{item}}</span>-->
-
-          <div class="mdc-card instance-size">
-              <div class="mdc-card__media mdc-card__media--16-9 instance-screenshot"></div>
-              <div class="instance-card-primary">
-                  <h2 class="instance-title">b71522a01eb94e00574911092fd1f39c</h2>
-                  <h3 class="instance-subtitle"><span class="os-icon windows-icon"></span>Chrome @ 192.168.1.14</h3>
-              </div>
-<!--              <div class="instance-card-secondary">-->
-<!--                  Visit ten places on our planet that are undergoing the biggest changes today.-->
-<!--              </div>-->
-              <div class="mdc-card__actions">
-                  <div class="mdc-card__action-buttons">
-                      <material-button>Info</material-button>
-                      <material-button>Inspect</material-button>
-                  </div>
-                  <div class="mdc-card__action-icons">
-                      <material-button raised class="red">Stop</material-button>
-                      <!--                      <material-button icon>-->
-<!--                          <material-icon icon="more_vert"></material-icon>-->
-<!--                      </material-button>-->
-                  </div>
-              </div>
-          </div>
-
-
-<!--      </li>-->
-<!--  </ul>-->
-<!--</div>-->
+<div *ngIf="instances.isNotEmpty" class="card-container">
+    <div *ngFor="let instance of instances; let i=index">
+        <div class="mdc-card instance-size">
+            <div class="mdc-card__media mdc-card__media--16-9" style="{{ getBackgroundFor(instance.screenshot) }}"></div>
+            <div class="instance-card-primary">
+                <h2 class="instance-title" title="Click to copy" (click)="copy(instance.sessionId)">{{ instance.sessionId }}</h2>
+                <h3 class="instance-subtitle"><span class="os-icon {{ getIcon(instance.platform) }}"></span>{{
+                    camelCase(instance.browserName) }} @ {{ instance.ip }}</h3>
+            </div>
+            <div class="instance-card-secondary">
+                <a href="{{ getURL(instance.url) }}" target="_blank">{{ instance.url }}</a>
+            </div>
+            <div class="mdc-card__actions">
+                <div class="mdc-card__action-buttons">
+                    <material-button>Info</material-button>
+                    <material-button>Inspect</material-button>
+                </div>
+                <div class="mdc-card__action-icons">
+                    <material-button raised class="red">Stop</material-button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -28,7 +28,6 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
   String path = request.uri.path;
   String resultPath = path == '/' || path == '\\' ? '\\index.html' : path;
   File file = File('$basePath$resultPath');
-  print(path);
 
   var subs = path.replaceAll('\\', '/').split('/').where((str) => str.trim().isNotEmpty).toList();
   var dartFile = getDartFile(subs);

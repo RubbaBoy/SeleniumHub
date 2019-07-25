@@ -34,8 +34,6 @@ class SeleniumProxy extends RawRequestable {
     var jsonBody = response.body;
     contentType = rawContentType?.split('/');
 
-    print(jsonBody);
-
     var proxyResponse = request.response
       ..headers.contentType = ContentType(contentType[0], contentType[1])
       ..statusCode = response.statusCode;
@@ -53,16 +51,15 @@ class SeleniumProxy extends RawRequestable {
       instanceManager.addInstance(SeleniumInstance(
           json['sessionId'],
           request.connectionInfo.remoteAddress.address,
-          true,
           value['browserName'],
           value['chrome']['chromedriverVersion'],
           value['chrome']['userDataDir'],
           value['goog:chromeOptions']['debuggerAddress'],
           value['platform'],
-          value['version']));
+          value['version'],
+          await instanceManager.getScreenshot(json['sessionId']),
+          await instanceManager.getUrl(json['sessionId'])));
     }
-
-    return;
   }
 
   Future<String> getBody(HttpRequest request) async {

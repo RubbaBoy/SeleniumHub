@@ -10,7 +10,6 @@ import 'requestable.dart';
 class API extends Requestable {
 
   InstanceManager instanceManager;
-  Uuid uuid = Uuid();
 
   API(this.instanceManager);
 
@@ -18,17 +17,28 @@ class API extends Requestable {
   dynamic request(List<String> sub, Map<String, String> queryParams) {
     switch (sub[0]) {
       case 'getInstances':
-        return jsonEncode(instanceManager.instances.map((instance) => instance.toJson()).toList());
-      case 'addInstance':
-        var thisUuid = uuid.v5(Uuid.NAMESPACE_URL, 'uddernetworks.com');
-        var verify = verifyParameters(queryParams, ['ip']);
-        return {
-          'message': 'Added instance',
-          'id': thisUuid
-        };
-      case 'removeInstance':
-
-        return null;
+        var sessionIds = queryParams['sessionIds']?.split(',') ??
+            instanceManager.instances.map((instance) => instance.sessionId);
+        return jsonEncode(instanceManager.instances
+            .where((instance) => sessionIds.contains(instance.sessionId))
+            .map((instance) => instance.toJson()).toList());
+      case 'getRevisions':
+        return jsonEncode(instanceManager.instances.map((instance) => {
+          'sessionId': instance.sessionId,
+          'revisionId': instance.revisionId
+        }).toList());
+      case 'getRevised': // TODO: Do more than give the screenshots?
+        var ids = queryParams['sessionIds'];
+        if (ids == null) return {'message': 'Required query parameter: sessionIds'};
+        var sessionIds = ids.split(',');
+        return jsonEncode(instanceManager.instances
+            .where((instance) => sessionIds.contains(instance.sessionId))
+            .map((instance) => {
+          'sessionId': instance.sessionId,
+          'revisionId': instance.revisionId,
+          'screenshot': instance.screenshot
+        }).toList());
+        break;
       default:
         return {'message': 'unknown endpoint "${sub[0]}"'};
     }

@@ -84,7 +84,13 @@ section {
   }
 }
 
+.card-container {
+  display: flex;
+}
 
+.mdc-card {
+  margin: 0 20px;
+}
 
 //////// OS Icons
 
