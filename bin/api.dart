@@ -16,7 +16,7 @@ class API extends Requestable {
   API(this.instanceManager);
 
   @override
-  dynamic request(List<String> sub, Map<String, String> queryParams) {
+  Future<dynamic> request(List<String> sub, Map<String, String> queryParams) async {
     switch (sub[0]) {
       case 'getInstances':
         var sessionIds = queryParams['sessionIds']?.split(',') ??
@@ -51,6 +51,12 @@ class API extends Requestable {
           instanceManager.deleteInstance(id);
         });
         break;
+      case 'devToolsList':
+        var id = queryParams['sessionId'];
+        if (id == null) return {'message': 'Required query parameter: sessionId'};
+        var instance = instanceManager.getInstance(id);
+        if (instance == null) return {'message': 'Unknown sessionId: $id'};
+        return (await client.get('http://${instance.debuggerAddress}/json/list')).body;
       default:
         return {'message': 'unknown endpoint "${sub[0]}"'};
     }
@@ -61,10 +67,10 @@ class API extends Requestable {
   }
 
   Map<String, dynamic> verifyParameters(Map<String, String> queryParams, List<String> verify) {
-    if (queryParams.keys.toSet().containsAll(verify)) return { 'message': 'Error: required parameters: ${verify.join(', ')}' };
+    if (queryParams.keys.toSet().containsAll(verify)) return { 'message': 'Required parameters: ${verify.join(', ')}' };
     return null;
   }
 
   @override
-  ContentType getContentType() => ContentType('application', 'json');
+  ContentType getContentType() => ContentType.json;
 }

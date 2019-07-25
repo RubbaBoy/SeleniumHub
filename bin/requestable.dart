@@ -9,16 +9,22 @@ class Requestable extends RawRequestable {
 
   requestRaw(HttpRequest httpRequest, List<String> subs) async {
     var response = httpRequest.response
-      ..headers.contentType = getContentType()
       ..headers.add('Access-Control-Allow-Origin', '*')
       ..statusCode = 200;
-    var apiResponse = request(subs, httpRequest.uri.queryParameters);
-    var sending = apiResponse;
-    if (apiResponse is Map<String, dynamic>) sending = jsonEncode(apiResponse);
+    var apiResponseAndMIME = await contentRequest(subs, httpRequest);
+    response.headers.contentType = apiResponseAndMIME[1];
+    dynamic sending = apiResponseAndMIME[0];
+    if (sending is Map<String, dynamic>) sending = jsonEncode(sending);
     await response.write(sending);
     await response.close();
   }
 
-  dynamic request(List<String> sub, Map<String, String> queryParams) {}
+  // Returns <dynamic Response, ContentType MIME>
+  Future<dynamic> request(List<String> sub, Map<String, String> queryParams) async {}
+
+  Future<List<dynamic>> contentRequest(List<String> sub, HttpRequest httpRequest) async {
+    return [await request(sub, httpRequest.uri.queryParameters), getContentType()];
+  }
+
   ContentType getContentType() {}
 }

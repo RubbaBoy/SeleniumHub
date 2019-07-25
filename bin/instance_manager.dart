@@ -48,6 +48,10 @@ class InstanceManager {
         .get('http://localhost:4444/session/$id/url')
         .then((response) => jsonDecode(response.body)['value']);
 
+  int getPort(SeleniumInstance instance) => int.parse(instance.debuggerAddress.split(':')[1]);
+
+  SeleniumInstance getInstance(String id) => instances.firstWhere((instance) => instance.sessionId == id);
+
   Future<void> initCurrentInstances() async {
     var response = await client.get('http://localhost:4444/sessions');
     var values = jsonDecode(response.body)['value'];

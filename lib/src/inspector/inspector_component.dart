@@ -20,7 +20,7 @@ import 'package:clippy/browser.dart' as clippy;
     'package:angular_components/css/mdc_web/card/mdc-card.scss.css',
     'package:angular_components/app_layout/layout.scss.css',
   ],
-  templateUrl: 'todo_list_component.html',
+  templateUrl: 'inspector_component.html',
   directives: [
     MaterialButtonComponent,
     MaterialIconComponent,
@@ -46,11 +46,9 @@ class TodoListComponent implements OnInit {
   SeleniumInstance showingInfo;
   bool showInfo = false;
   bool showConfirmation = false;
-  bool showInspectChooser = false;
   String confirmingId;
   DomSanitizationService sanitizer;
   Set<SeleniumInstance> instances = Set();
-  List<Map<String, dynamic>> inspectWindows = [];
 //  Map<String, String> currRevisions = {};
 
   TodoListComponent(this.sanitizer);
@@ -161,21 +159,6 @@ class TodoListComponent implements OnInit {
     if (platform.contains('windows')) return 'windows-icon';
     if (platform.contains('mac') || platform.contains('osx')) return 'mac-icon';
     return 'linux-icon';
-  }
-
-  void openInspectChooser(SeleniumInstance instance) {
-    HttpRequest.getString(
-        '//localhost:6969/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
-          inspectWindows = jsonDecode(response);
-          showInspectChooser = true;
-    });
-  }
-
-  void inspectWindow(Map<String, dynamic> inspect) {
-    showInspectChooser = false;
-    print('Inspecting ${inspect['title']}');
-
-    // inspects something from inspectWindows
   }
 
   SeleniumInstance getInst(String id) => instances.firstWhere((instance) => instance.sessionId == id);

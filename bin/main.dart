@@ -5,6 +5,7 @@ import 'dart:mirrors';
 
 import 'package:mime/mime.dart';
 
+import 'inspector/inspector_http_proxy.dart';
 import 'instance_manager.dart';
 import 'requestable.dart';
 import 'api.dart';
@@ -13,9 +14,22 @@ import 'selenium_proxy.dart';
 InstanceManager instanceManager = InstanceManager();
 
 Map<String, RawRequestable> DART_FILES = {
-  "api": API(instanceManager),
-  "selenium": SeleniumProxy(instanceManager)
+  'api': API(instanceManager),
+  'selenium': SeleniumProxy(instanceManager),
+  'devtools': InspectorHttpProxy(instanceManager)
 };
+
+/*
+
+Have the devtools proxy hook into InstanceManager and have urls similar to:
+/devtools/:session_id/
+
+and route everything in that path to
+localhost:post/devtools/
+
+in association to the correct port, with a separate socket for each, and the one main web server
+
+ */
 
 Future<void> runServer(String basePath) async {
   final server = await HttpServer.bind('127.0.0.1', 6969);
@@ -72,7 +86,7 @@ Future<void> sendNotFound(HttpResponse response) async {
 
 void setResponseCode(HttpRequest request, int code, {String message = ''}) {
   request
-    ..headers.contentType = ContentType('application', 'json')
+    ..headers.contentType = ContentType.json
     ..response.statusCode = code;
   if (message.trim().isNotEmpty) request.response.write(message);
   request.response.close();

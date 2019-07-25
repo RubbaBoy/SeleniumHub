@@ -31,39 +31,6 @@
     </material-dialog>
 </modal>
 
-<modal [(visible)]="showInspectChooser">
-    <material-dialog class="basic-dialog">
-        <h1 header>Choose window to inspect for {{ showingInfo?.sessionId }}</h1>
-
-        <div *ngI="inspectWindows.isEmpty">
-            <p>No inspect windows available</p>
-        </div>
-
-        <div *ngIf="inspectWindows.isNotEmpty" class="card-container">
-            <div *ngFor="let inspect of inspectWindows; let i=index">
-                <material-expansionpanel
-                        autoDismissable
-                        name="{{ inspect['title'] }}">
-                    This panel will be automatically collapsed when there is a click outside of it.
-
-                    <div toolbelt>
-                        <material-yes-no-buttons class="custom-toolbelt-buttons"
-                                                 yesText="Inspect"
-                                                 noText="Cancel"
-                                                 (yes)="inspectWindow(inspect)"
-                                                 (no)="showInspectChooser = false">
-                        </material-yes-no-buttons>
-                    </div>
-                </material-expansionpanel>
-            </div>
-        </div>
-
-        <div footer class="margined-button">
-            <material-button clear-size (trigger)="showInfo = false">Close</material-button>
-        </div>
-    </material-dialog>
-</modal>
-
 <div *ngIf="instances.isNotEmpty" class="card-container">
     <div *ngFor="let instance of instances; let i=index">
         <div class="mdc-card instance-size">

@@ -1,0 +1,124 @@
+:host {
+
+}
+
+.red {
+  background-color: #db4437;
+  color: white;
+}
+
+.blue {
+  background-color: #3f51b5;
+  color: white;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  line-height: 3em;
+}
+
+li:hover {
+  background-color: #EEEEEE;
+}
+
+li material-checkbox {
+  vertical-align: middle;
+}
+
+li material-fab {
+  float: right;
+  vertical-align: middle;
+}
+
+.done {
+  text-decoration: line-through;
+}
+
+.info-json {
+  font-family: monospace, Roboto, Helvetica, Arial, sans-serif;
+}
+
+.margined-button {
+  margin-top: 15px;
+}
+
+@import 'package:angular_components/css/material/material';
+
+//////////// Cards
+$mdc-card-image: 'https://rubbaboy.me/images/n2mycge';
+
+// Provide a size for the card. Cards normally take up the complete space of
+// their parent.
+.instance-size {
+  width: $mat-grid * 44;
+}
+
+// Provide material styling for the title.
+.instance-title {
+  @include mat-font-title;
+  line-height: 1em; // legacy setting
+  margin: 0;
+}
+
+// Provider material styling for the subtitle.
+.instance-subtitle {
+  @include mat-font-subhead;
+  margin: 10px 0 0;
+}
+
+// Use the same image as the mdc-web example.
+.instance-screenshot {
+  background-image: url($mdc-card-image);
+}
+
+.instance-card-primary {
+  padding: $mat-grid * 2;
+}
+
+.instance-card-secondary {
+  @include mat-font-body;
+  padding: 0 $mat-grid * 2 $mat-grid;
+}
+
+section {
+  display: block;
+
+  + section {
+    margin-left: $mat-grid * 4;
+  }
+}
+
+.card-container {
+  display: flex;
+}
+
+.mdc-card {
+  margin: 0 20px;
+}
+
+//////// OS Icons
+
+.os-icon {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background-size: 100%;
+  vertical-align: middle;
+  margin-right: 10px;
+}
+
+.windows-icon {
+  background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMjQiIGhlaWdodD0iMjQiCnZpZXdCb3g9IjAgMCAyNCAyNCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij4gICAgPHBhdGggZD0iTSAyMiAzIEwgMTMgMy45MDAzOTA2IEwgMTMgMTEgTCAyMiAxMSBMIDIyIDMgeiBNIDExIDQuMDk5NjA5NCBMIDIgNSBMIDIgMTEgTCAxMSAxMSBMIDExIDQuMDk5NjA5NCB6IE0gMiAxMyBMIDIgMTkgTCAxMSAxOS45MDAzOTEgTCAxMSAxMyBMIDIgMTMgeiBNIDEzIDEzIEwgMTMgMjAuMDk5NjA5IEwgMjIgMjEgTCAyMiAxMyBMIDEzIDEzIHoiPjwvcGF0aD48L3N2Zz4=') 50% 50% no-repeat;
+}
+
+.linux-icon {
+  background: url(https://img.icons8.com/material/24/000000/ubuntu.png);
+}
+
+.mac-icon {
+    background: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjBweCIgeT0iMHB4Igp3aWR0aD0iMjQiIGhlaWdodD0iMjQiCnZpZXdCb3g9IjAgMCAyNCAyNCIKc3R5bGU9IiBmaWxsOiMwMDAwMDA7Ij4gICAgPHBhdGggZD0iTSAxNS45ODQzNzUgMiBDIDE0LjkyMDM3NSAyLjExNCAxMy43NTA4NTkgMi43OTUwNzgxIDEzLjAwNTg1OSAzLjcwNTA3ODEgQyAxMi4zNjc4NTkgNC41MDAwNzgxIDExLjgzNTgyOCA1Ljc1IDEyLjA0ODgyOCA3IEMgMTMuMTExODI4IDcgMTQuMjgxMzkxIDYuMjA0OTIxOSAxNS4wMjUzOTEgNS4yOTQ5MjE5IEMgMTUuNjY0MzkxIDQuMzg1OTIxOSAxNi4wOTAzNzUgMy4yNSAxNS45ODQzNzUgMiB6IE0gOC4zNTM1MTU2IDcgQyA2LjcyOTUxNTYgNyA0Ljk5MDMxMjUgNy45NzggMy45NDUzMTI1IDkuNSBDIDIuNDM3MzEyNSAxMS42NzQgMi42Njk0Njg4IDE1LjgwNTIwMyA1LjEwNTQ2ODggMTkuMjgzMjAzIEMgNi4wMzQ0Njg4IDIwLjU4NzIwMyA3LjE5MzE3MTkgMjIgOC43MDExNzE5IDIyIEMgMTAuMDkzMTcyIDIyIDEwLjQ0MTgyOCAyMS4xMzA4NTkgMTIuMjk4ODI4IDIxLjEzMDg1OSBDIDE0LjE1NTgyOCAyMS4xMzA4NTkgMTQuNTAyNTMxIDIyIDE1Ljg5NDUzMSAyMiBDIDE3LjUxODUzMSAyMiAxOC42Nzk0MjIgMjAuNDc3ODI4IDE5LjYwNzQyMiAxOS4xNzM4MjggQyAyMC4zMDM0MjIgMTguMzA0ODI4IDIwLjUzNiAxNy43NjEyMDMgMjEgMTYuNzgzMjAzIEMgMTcuNDAzIDE1LjQ3ODIwMyAxNi44MjI2ODggMTAuODA0MDMxIDIwLjMwNDY4OCA4Ljk1NzAzMTIgQyAxOS4xNDM2ODcgNy43NjEwMzEyIDE3LjYzNjE0MSA3IDE2LjI0NDE0MSA3IEMgMTQuMzg3MTQxIDcgMTMuNTc1ODI4IDggMTIuMjk4ODI4IDggQyAxMS4wMjE4MjggOCA5Ljk3NzUxNTYgNyA4LjM1MzUxNTYgNyB6Ij48L3BhdGg+PC9zdmc+') 50% 50% no-repeat;
+}
