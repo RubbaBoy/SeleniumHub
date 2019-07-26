@@ -1,0 +1,31 @@
+:host {
+
+}
+
+.frame {
+  width: 100vw;
+  height: calc(100vh - 64px);
+  left: 0;
+  top: 64px;
+  position: absolute;
+  border: none;
+}
+
+.red {
+  background-color: #db4437;
+  color: white;
+}
+
+.blue {
+  background-color: #3f51b5;
+  color: white;
+}
+
+.param-error {
+  color: #db4437;
+}
+
+pre {
+  background: cornsilk;
+  padding-left: 25px;
+}

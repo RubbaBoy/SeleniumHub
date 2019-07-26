@@ -143,7 +143,7 @@ class InstancesComponent implements OnInit {
       print(e);
     }
 
-    Timer(Duration(seconds: settings.screenshotInterval), () => checkRevisions());
+    Timer(Duration(milliseconds: settings.screenshotInterval), () => checkRevisions());
   }
 
   void showStopConfirmation(SeleniumInstance instance) {

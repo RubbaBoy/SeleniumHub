@@ -16,3 +16,7 @@ body {
   text-overflow: ellipsis;
   overflow: hidden;
 }
+
+pre {
+  font-family: monospace, Roboto, Helvetica, Arial, sans-serif;
+}

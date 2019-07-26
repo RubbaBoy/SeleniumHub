@@ -1,0 +1,32 @@
+<h1 class="instances-title">Connecting</h1>
+<div class="controls">
+    <p>
+        This program is the webserver you are currently on to display instances, along with a backend API that proxies
+        selenium instances that you connect to. For inspection, this program also has a WebSocket proxy for the
+        instances the backend API gets. Currently this only is tested on chrome, though will most likely work for other
+        browsers, just not inspection.
+
+        To connect, you must be using selenium (no shit) on the JsonWire spec, and connect via whatever remote interface
+        your API uses from the following URI:
+    </p>
+    <pre>
+{{ host }}:{{ port }}/selenium/
+    </pre>
+    <p>
+        The following are some examples of connecting with the server:
+    </p>
+
+    <h2>Dart</h2>
+    <p>Using the <a href="https://pub.dev/packages/webdriver">webdriver</a> package</p>
+    <pre>
+var driver = await createDriver(uri: Uri.parse('http://{{ host }}:{{ port }}/selenium/'), spec: WebDriverSpec.JsonWire);
+    </pre>
+
+    <h2>Java</h2>
+    <p>Using the <a href="https://search.maven.org/artifact/org.seleniumhq.selenium/selenium/">Selenium</a> and
+        <a href="https://search.maven.org/artifact/org.seleniumhq.selenium/selenium-chromium-driver/">Chromeium
+            Driver</a> libraries</p>
+    <pre>
+var driver = new RemoteWebDriver(new URL("http://{{ host }}:{{ port }}/selenium/"), new ChromeOptions());
+    </pre>
+</div>

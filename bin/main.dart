@@ -75,13 +75,13 @@ RawRequestable getDartFile(List<String> query) {
 }
 
 Future<void> sendInternalError(HttpResponse response) async {
-  response.statusCode = HttpStatus.internalServerError;
-  await response.close();
+//  response.statusCode = HttpStatus.internalServerError;
+  await response?.close();
 }
 
 Future<void> sendNotFound(HttpResponse response) async {
-  response.statusCode = HttpStatus.notFound;
-  await response.close();
+  response?.statusCode = HttpStatus.notFound;
+  await response?.close();
 }
 
 void setResponseCode(HttpRequest request, int code, {String message = ''}) {

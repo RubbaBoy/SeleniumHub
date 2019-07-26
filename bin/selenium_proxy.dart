@@ -16,7 +16,7 @@ class SeleniumProxy extends RawRequestable {
 
   @override
   requestRaw(HttpRequest request, List<String> subs) async {
-    var body = UIntStuffToString(request);
+    var body = await UIntStuffToString(request);
 
     var seleniumUrl = request.uri.toString().replaceFirst('/selenium/', '');
     var client = http.Client();
@@ -45,11 +45,16 @@ class SeleniumProxy extends RawRequestable {
     if (seleniumUrl == 'session') {
       var json = jsonDecode(jsonBody);
       var value = json['value'];
-      print('Created instance with session ID of ${json['sessionId']}');
+      var sessionId = json['sessionId'] ?? value['sessionId'];
+      if (sessionId == null) {
+        print('Attempted to create selenium with no ID');
+        return;
+      }
+      print('Created instance with session ID of $sessionId');
 
       // TODO: Assuming chrome for now
       instanceManager.addInstance(SeleniumInstance(
-          json['sessionId'],
+          sessionId,
           request.connectionInfo.remoteAddress.address,
           value['browserName'],
           value['chrome']['chromedriverVersion'],
@@ -57,29 +62,13 @@ class SeleniumProxy extends RawRequestable {
           value['goog:chromeOptions']['debuggerAddress'],
           value['platform'],
           value['version'],
-          await instanceManager.getScreenshot(json['sessionId']),
-          await instanceManager.getUrl(json['sessionId'])));
+          await instanceManager.getScreenshot(sessionId),
+          await instanceManager.getUrl(sessionId)));
     }
   }
 
-  static String UIntStuffToString(HttpRequest request) {
-    StringBuffer buffer = StringBuffer();
-    request.forEach((bytes) {
-      for (int i = 0; i < bytes.length;) {
-        int firstWord = (bytes[i] << 8) + bytes[i + 1];
-        if (0xD800 <= firstWord && firstWord <= 0xDBFF) {
-          int secondWord = (bytes[i + 2] << 8) + bytes[i + 3];
-          buffer.writeCharCode(
-              ((firstWord - 0xD800) << 10) + (secondWord - 0xDC00) + 0x10000);
-          i += 4;
-        }
-        else {
-          buffer.writeCharCode(firstWord);
-          i += 2;
-        }
-      }
-    });
-    return buffer.toString();
+  static Future<String> UIntStuffToString(HttpRequest request) {
+    return request.map((bytes) => bytes.map((value) => String.fromCharCode(value)).join('')).join('');
   }
 
 }
