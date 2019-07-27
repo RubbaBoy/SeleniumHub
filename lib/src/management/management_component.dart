@@ -20,13 +20,13 @@ import 'package:clippy/browser.dart' as clippy;
 import '../routes.dart';
 
 @Component(
-  selector: 'connect',
+  selector: 'management',
   styleUrls: [
-    'connect_component.css',
+    'management_component.css',
     'package:angular_components/css/mdc_web/card/mdc-card.scss.css',
     'package:angular_components/app_layout/layout.scss.css',
   ],
-  templateUrl: 'connect_component.html',
+  templateUrl: 'management_component.html',
   directives: [
     MaterialButtonComponent,
     MaterialIconComponent,
@@ -52,14 +52,14 @@ import '../routes.dart';
   providers: [overlayBindings],
   exports: [RoutePaths, Routes]
 )
-class ConnectComponent implements OnInit {
+class ManagementComponent implements OnInit {
 
   final DomSanitizationService sanitizer;
 
   String host;
   int port;
 
-  ConnectComponent(this.sanitizer);
+  ManagementComponent(this.sanitizer);
 
   @override
   void ngOnInit() {

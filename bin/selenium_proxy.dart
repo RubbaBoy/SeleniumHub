@@ -2,20 +2,28 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:SeleniumHub/src/instances/selenium_instance.dart';
+import 'package:SeleniumHub/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
 import 'instance_manager.dart';
 import 'main.dart';
 import 'requestable.dart';
+import 'webdriver_controller.dart';
 
 class SeleniumProxy extends RawRequestable {
   InstanceManager instanceManager;
+  DriverController driverController;
 
-  SeleniumProxy(this.instanceManager);
+  SeleniumProxy(this.instanceManager, this.driverController);
 
   @override
   requestRaw(HttpRequest request, List<String> subs) async {
+    if (!driverController.DRIVER_STARTED) {
+      request.response.statusCode = HttpStatus.internalServerError;
+      await request.response.close();
+      return;
+    }
+
     var body = await UIntStuffToString(request);
 
     var seleniumUrl = request.uri.toString().replaceFirst('/selenium/', '');

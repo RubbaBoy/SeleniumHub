@@ -5,4 +5,5 @@ class RoutePaths {
   static final inspector = RoutePath(path: 'inspector');
   static final settings = RoutePath(path: 'settings');
   static final connect = RoutePath(path: 'connect');
+  static final management = RoutePath(path: 'management');
 }

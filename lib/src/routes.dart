@@ -4,6 +4,7 @@ import 'instances/instances_component.template.dart' as instances_template;
 import 'inspector/inspector_component.template.dart' as inspector_template;
 import 'settings/settings_component.template.dart' as settings_template;
 import 'connect/connect_component.template.dart' as connect_template;
+import 'management/management_component.template.dart' as management_template;
 import 'route_paths.dart';
 
 export 'route_paths.dart';
@@ -30,10 +31,16 @@ class Routes {
     component: connect_template.ConnectComponentNgFactory,
   );
 
+  static final management = RouteDefinition(
+    routePath: RoutePaths.management,
+    component: management_template.ManagementComponentNgFactory,
+  );
+
   static final all = <RouteDefinition>[
     instances,
     inspector,
     settings,
     connect,
+    management,
   ];
 }

@@ -12,3 +12,5 @@ doc/api/
 config.yaml
 .idea/
 *.iml
+
+chromedriver*

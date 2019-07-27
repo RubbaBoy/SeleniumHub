@@ -7,7 +7,7 @@ import 'package:angular/security.dart';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:SeleniumHub/src/instances/selenium_instance.dart';
+import 'package:SeleniumHub/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_router/angular_router.dart';

@@ -9,27 +9,17 @@ import 'inspector/inspector_http_proxy.dart';
 import 'instance_manager.dart';
 import 'requestable.dart';
 import 'api.dart';
+import 'webdriver_controller.dart';
 import 'selenium_proxy.dart';
 
 InstanceManager instanceManager = InstanceManager();
+DriverController driverController = DriverController();
 
 Map<String, RawRequestable> DART_FILES = {
-  'api': API(instanceManager),
-  'selenium': SeleniumProxy(instanceManager),
-  'devtools': InspectorHttpProxy(instanceManager)
+  'api': API(instanceManager, driverController),
+  'selenium': SeleniumProxy(instanceManager, driverController),
+  'devtools': InspectorHttpProxy(instanceManager, driverController)
 };
-
-/*
-
-Have the devtools proxy hook into InstanceManager and have urls similar to:
-/devtools/:session_id/
-
-and route everything in that path to
-localhost:post/devtools/
-
-in association to the correct port, with a separate socket for each, and the one main web server
-
- */
 
 Future<void> runServer(String basePath) async {
   final server = await HttpServer.bind('127.0.0.1', 6969);
@@ -93,8 +83,13 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
 }
 
 Future<void> main(List<String> args) async {
-  print('Grabbing initial instances...');
-  await instanceManager.initCurrentInstances();
-  print('Finished initializing initial instances');
+  if (await driverController.isDriverRunning()) {
+    print('Grabbing initial instances...');
+    await instanceManager.initCurrentInstances();
+    print('Finished initializing initial instances');
+  } else {
+    print('Driver not running, so not checking for initial instances.');
+  }
+
   await runServer(args.isNotEmpty ? args[0] : File(Platform.script.toFilePath()).parent.path);
 }

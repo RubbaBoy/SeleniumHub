@@ -23,7 +23,15 @@ class Requestable extends RawRequestable {
   Future<dynamic> request(List<String> sub, Map<String, String> queryParams) async {}
 
   Future<List<dynamic>> contentRequest(List<String> sub, HttpRequest httpRequest) async {
-    return [await request(sub, httpRequest.uri.queryParameters), getContentType()];
+    var requestResult;
+    try {
+      requestResult = await request(sub, httpRequest.uri.queryParameters);
+    } catch (e) {
+      print(e);
+      requestResult = { 'message': 'An internal error has occured, here are the details: $e' };
+    }
+
+    return [requestResult, getContentType()];
   }
 
   ContentType getContentType() {}

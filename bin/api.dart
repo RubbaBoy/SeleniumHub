@@ -2,22 +2,25 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:SeleniumHub/src/settings.dart';
-import 'package:SeleniumHub/src/instances/selenium_instance.dart';
+import 'package:SeleniumHub/selenium_instance.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 import 'instance_manager.dart';
 import 'requestable.dart';
+import 'webdriver_controller.dart';
 
 class API extends Requestable {
 
   var client = http.Client();
   InstanceManager instanceManager;
+  DriverController driverController;
 
-  API(this.instanceManager);
+  API(this.instanceManager, this.driverController);
 
   @override
   Future<dynamic> request(List<String> sub, Map<String, String> queryParams) async {
+    if (!driverController.DRIVER_STARTED && !['getDriverStatus', 'startDriver', 'stopDriver'].contains(sub[0])) return { 'message': 'The web driver has not yet been started.' };
     switch (sub[0]) {
       case 'getInstances':
         var sessionIds = queryParams['sessionIds']?.split(',') ??
@@ -79,8 +82,18 @@ class API extends Requestable {
           return {'message': 'An error occured. Here are the details: $e'};
         }
         return {'message': 'Successfully wrote to settings'};
+      case 'getDriverStatus':
+        return { 'message': 'The driver is ${await driverController.isDriverRunning() ? '' : 'not '}running' };
+      case 'startDriver':
+        if (await driverController.isDriverRunning()) return { 'message': 'The driver has already been started' };
+        await driverController.startDriver();
+        return { 'message': 'The driver has been started' };
+      case 'stopDriver':
+        if (!await driverController.isDriverRunning()) return { 'message': 'The driver has already been stopped' };
+        await driverController.stopDriver();
+        return { 'message': 'The driver has been stopped' };
       default:
-        return {'message': 'unknown endpoint "${sub[0]}"'};
+        return {'message': 'Unknown endpoint "${sub[0]}"'};
     }
   }
 
