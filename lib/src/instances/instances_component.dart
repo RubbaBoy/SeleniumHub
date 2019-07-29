@@ -55,8 +55,9 @@ import '../settings.dart';
   providers: [overlayBindings],
   exports: [RoutePaths, Routes]
 )
-class InstancesComponent implements OnInit {
+class InstancesComponent implements OnActivate, OnDeactivate {
 
+  bool stop = false;
   SeleniumInstance showingInfo;
   bool showInfo = false;
   bool showConfirmation = false;
@@ -95,10 +96,16 @@ class InstancesComponent implements OnInit {
   }
 
   @override
-  Future ngOnInit() async {
+  Future onActivate(RouterState previous, RouterState current) async {
+    stop = false;
     var json = await HttpRequest.getString('${Uri.base.origin}/api/getSettings');
     settings = Settings.fromJson(jsonDecode(json));
     checkRevisions();
+  }
+
+  @override
+  void onDeactivate(RouterState current, RouterState next) {
+    stop = true;
   }
 
   void checkRevisions() async {
@@ -143,7 +150,7 @@ class InstancesComponent implements OnInit {
       print(e);
     }
 
-    Timer(Duration(milliseconds: settings.screenshotInterval), () => checkRevisions());
+    if (!stop) Timer(Duration(milliseconds: settings.screenshotInterval), () => checkRevisions());
   }
 
   void showStopConfirmation(SeleniumInstance instance) {

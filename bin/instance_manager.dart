@@ -4,13 +4,17 @@ import 'dart:convert';
 import 'package:SeleniumHub/selenium_instance.dart';
 import 'package:http/http.dart' as http;
 
+import 'inspector/inspector_ws_proxy.dart';
+
 class InstanceManager {
   var client = http.Client();
+  InspectorWebsocketProxy websocketProxy;
   List<SeleniumInstance> instances = [];
   List<InstanceWatcher> watchers = [];
 
   void addInstance(SeleniumInstance instance) {
     instances.add(instance);
+    websocketProxy.startInstance(instance);
     addWatcher(instance);
   }
 
@@ -25,6 +29,7 @@ class InstanceManager {
   }
 
   void deleteInstance(String id) {
+    websocketProxy.stopInstance(id);
     client.delete('http://localhost:4444/session/$id');
     var instance = instances.firstWhere((instance) => instance.sessionId == id, orElse: () => null);
     if (instance != null) {

@@ -7,6 +7,7 @@ import 'package:args/args.dart';
 import 'package:mime/mime.dart';
 
 import 'inspector/inspector_http_proxy.dart';
+import 'inspector/inspector_ws_proxy.dart';
 import 'instance_manager.dart';
 import 'requestable.dart';
 import 'api.dart';
@@ -16,6 +17,7 @@ import 'selenium_proxy.dart';
 int _port = 42069;
 InstanceManager instanceManager = InstanceManager();
 DriverController driverController = DriverController();
+InspectorWebsocketProxy websocketProxy;
 
 Map<String, RawRequestable> DART_FILES = {
   'api': API(instanceManager, driverController),
@@ -48,14 +50,16 @@ Future<void> handleRequest(String basePath, HttpRequest request) async {
       await response.addStream(file.openRead());
       await response.close();
     } catch (e) {
-      print('Error happened: $e');
+      print('1 Error happened: $e');
+      print(e);
       await sendInternalError(request.response);
     }
   } else if (dartFile != null) {
     try {
       await dartFile.requestRaw(request, subs.skip(1).toList());
     } catch (e) {
-      print('Error happened: $e');
+      print('2 Error happened: $e');
+      print(e);
       await sendInternalError(request.response);
     }
   } else {
@@ -87,7 +91,9 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
 
 // main.dart [port] [build dir] [chromedriver path]
 Future<void> main(List<String> args) async {
-  if (args.isEmpty || args[0].toLowerCase() == 'help') {
+  websocketProxy = InspectorWebsocketProxy(instanceManager);
+  instanceManager.websocketProxy = websocketProxy;
+  if (args.isNotEmpty && args[0].toLowerCase() == '--help') {
     print('Usage: main.dart --port [port] --build [build dir] --driver [chromedriver path]');
     return;
   }

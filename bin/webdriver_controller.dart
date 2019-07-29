@@ -39,7 +39,7 @@ class DriverController {
       var result = Process.runSync('tasklist', []);
       return DRIVER_STARTED = result.stdout.contains('chromedriver.exe');
     } else if (Platform.isLinux) {
-      var result = await Process.runSync('top', []);
+      var result = await Process.runSync('ps', ['aux']);
       return DRIVER_STARTED = result.stdout.contains('chromedriver');
     } else {
       print('Error: Unsupported platform!');

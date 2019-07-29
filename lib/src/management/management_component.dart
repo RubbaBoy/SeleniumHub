@@ -49,10 +49,11 @@ import '../routes.dart';
   providers: [overlayBindings],
   exports: [RoutePaths, Routes]
 )
-class ManagementComponent implements OnInit {
+class ManagementComponent implements OnInit, OnDestroy {
 
   final DomSanitizationService sanitizer;
 
+  bool stop = false;
   bool showConfirmation;
 
   bool backendStatus = false;
@@ -63,7 +64,18 @@ class ManagementComponent implements OnInit {
 
   @override
   void ngOnInit() {
-    Timer.periodic(Duration(seconds: 1), (_t) => reloadStatuses());
+    Timer.periodic(Duration(seconds: 1), (_t) {
+      if (stop) {
+        _t.cancel();
+        return;
+      }
+      reloadStatuses();
+    });
+  }
+
+  @override
+  void ngOnDestroy() {
+    stop = true;
   }
 
   void reloadStatuses() async {

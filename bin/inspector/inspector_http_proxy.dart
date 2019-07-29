@@ -17,6 +17,7 @@ class InspectorHttpProxy extends Requestable {
   @override
   Future<List<dynamic>> contentRequest(List<String> sub, HttpRequest request) async {
     if (!driverController.DRIVER_STARTED) {
+      print('Webdriver not started');
       request.response.statusCode = HttpStatus.internalServerError;
       return [{ 'message': 'The web driver has not yet been started.' }, ContentType.json];
     }

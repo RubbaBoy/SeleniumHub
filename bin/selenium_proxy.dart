@@ -18,7 +18,7 @@ class SeleniumProxy extends RawRequestable {
 
   @override
   requestRaw(HttpRequest request, List<String> subs) async {
-    if (!driverController.DRIVER_STARTED) {
+    if (!await driverController.isDriverRunning()) {
       request.response.statusCode = HttpStatus.internalServerError;
       await request.response.close();
       return;
@@ -52,6 +52,7 @@ class SeleniumProxy extends RawRequestable {
 
     if (seleniumUrl == 'session') {
       var json = jsonDecode(jsonBody);
+      print(json);
       var value = json['value'];
       var sessionId = json['sessionId'] ?? value['sessionId'];
       if (sessionId == null) {
