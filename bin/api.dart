@@ -20,7 +20,7 @@ class API extends Requestable {
 
   @override
   Future<dynamic> request(List<String> sub, Map<String, String> queryParams) async {
-    if (!driverController.DRIVER_STARTED && !['getDriverStatus', 'startDriver', 'stopDriver'].contains(sub[0])) return { 'message': 'The web driver has not yet been started.' };
+    if (!driverController.DRIVER_STARTED && !['youUp', 'getDriverStatus', 'startDriver', 'stopDriver'].contains(sub[0])) return { 'message': 'The web driver has not yet been started.' };
     switch (sub[0]) {
       case 'getInstances':
         var sessionIds = queryParams['sessionIds']?.split(',') ??
@@ -92,6 +92,8 @@ class API extends Requestable {
         if (!await driverController.isDriverRunning()) return { 'message': 'The driver has already been stopped' };
         await driverController.stopDriver();
         return { 'message': 'The driver has been stopped' };
+      case 'youUp':
+        return {'message': 'yeah wyd'};
       default:
         return {'message': 'Unknown endpoint "${sub[0]}"'};
     }

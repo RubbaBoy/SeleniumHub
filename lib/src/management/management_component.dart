@@ -56,17 +56,48 @@ class ManagementComponent implements OnInit {
 
   final DomSanitizationService sanitizer;
 
-  String host;
-  int port;
+  bool showConfirmation;
+
+  bool backendStatus = false;
+  bool webserverStatus = false;
+  bool webdriverStatus = false;
 
   ManagementComponent(this.sanitizer);
 
   @override
   void ngOnInit() {
-    host = Uri.base.host;
-    port = Uri.base.port;
+    Timer.periodic(Duration(seconds: 1), (_t) => reloadStatuses());
   }
 
-  void copy(String copy) => clippy.write(copy);
+  void reloadStatuses() async {
+    var apiStatus = await request('//localhost:6969/api/youUp');
+    backendStatus = apiStatus == 'yeah wyd';
+
+    // Bruh you're on the webserver
+    webserverStatus = true;
+
+    var driverStatus = await request('//localhost:6969/api/getDriverStatus');
+    webdriverStatus = driverStatus == 'The driver is running';
+  }
+
+  void confirmStop() async {
+    showConfirmation = false;
+    await HttpRequest.getString('//localhost:6969/api/stopDriver');
+    print('Stopped webdriver.');
+  }
+
+  Future<void> startDriver() async {
+    await request('//localhost:6969/api/startDriver');
+    reloadStatuses();
+  }
+
+  Future<String> request(String url) async {
+    try {
+      return jsonDecode(await HttpRequest.getString(url))['message'];
+    } catch (e) {
+      print(e);
+    }
+    return '';
+  }
 
 }

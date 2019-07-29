@@ -1,6 +1,43 @@
+<modal [(visible)]="showConfirmation">
+    <material-dialog class="basic-dialog">
+        <h1 header>Are you sure you want to stop the webdriver?</h1>
+
+        <p>
+            This action will stop <b>ALL</b> currently running browser instances, and will unforeseeable consequences to
+            any connected programs, and all browser data will be lost. This is a non recoverable action.
+        </p>
+
+        <div footer>
+            <material-button clear-size (trigger)="showConfirmation = false">Close</material-button>
+            <material-button raised class="red" (trigger)="confirmStop()">Stop</material-button>
+        </div>
+
+    </material-dialog>
+</modal>
+
 <h1 class="instances-title">Management</h1>
 <div class="controls">
     <p>
-        Buttons to start/stop the driver will go here
+        This is a place to see the status of the services, and control the web driver. More features may come in the
+        future.
     </p>
+    <h2>WebDriver Control</h2>
+    <div>
+        <material-button raised class="blue" (trigger)="startDriver()">Start</material-button>
+        <material-button raised class="red" (trigger)="showConfirmation = true">Stop</material-button>
+    </div>
+
+    <h2 class="services-title">Services Status</h2>
+
+    <div class="status-wrapper">
+        <span class="status-text" [class.error]="!backendStatus">{{ backendStatus ? 'Backend operational' : 'No response from backend' }}</span>
+    </div>
+
+    <div class="status-wrapper">
+        <span class="status-text" [class.error]="!webserverStatus">{{ webserverStatus ? 'Webserver operational' : 'No response from webserver' }}</span>
+    </div>
+
+    <div class="status-wrapper">
+        <span class="status-text" [class.error]="!webdriverStatus">{{ webdriverStatus ? 'Webdriver operational' : 'No response from webdriver' }}</span>
+    </div>
 </div>

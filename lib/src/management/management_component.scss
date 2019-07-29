@@ -25,7 +25,19 @@
   color: #db4437;
 }
 
-pre {
-  background: cornsilk;
-  padding-left: 25px;
+.services-title {
+  margin-top: 25px;
+}
+
+.status-wrapper {
+  display: block;
+  font-size: 1.5em;
+  line-height: 1.5em;
+
+  .status-text {
+    color: green;
+    &.error {
+      color: red;
+    }
+  }
 }
