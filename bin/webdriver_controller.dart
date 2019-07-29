@@ -10,13 +10,15 @@ class DriverController {
 
   bool DRIVER_STARTED = false;
 
+  String driverLocation;
+
   void startDriver() async {
     if (!Platform.isWindows && !Platform.isLinux) {
       print('Error: Unsupported platform!');
       return;
     }
 
-    var process = await Process.start('chromedriver', ['--port=4444'], mode: ProcessStartMode.detachedWithStdio);
+    var process = await Process.start(driverLocation, ['--port=4444'], mode: ProcessStartMode.detachedWithStdio);
     print('Started the chromedriver as PID ${process.pid}');
   }
 
@@ -37,7 +39,7 @@ class DriverController {
       var result = Process.runSync('tasklist', []);
       return DRIVER_STARTED = result.stdout.contains('chromedriver.exe');
     } else if (Platform.isLinux) {
-      var result = await Process.runSync('pa', ['-A']);
+      var result = await Process.runSync('top', []);
       return DRIVER_STARTED = result.stdout.contains('chromedriver');
     } else {
       print('Error: Unsupported platform!');

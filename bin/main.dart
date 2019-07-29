@@ -12,6 +12,7 @@ import 'api.dart';
 import 'webdriver_controller.dart';
 import 'selenium_proxy.dart';
 
+int _port = 42069;
 InstanceManager instanceManager = InstanceManager();
 DriverController driverController = DriverController();
 
@@ -22,7 +23,8 @@ Map<String, RawRequestable> DART_FILES = {
 };
 
 Future<void> runServer(String basePath) async {
-  final server = await HttpServer.bind('127.0.0.1', 42069);
+  final server = await HttpServer.bind('0.0.0.0', _port);
+  print('Webserver open on localhost:42069');
   await for (HttpRequest request in server) {
     await handleRequest(basePath, request);
   }
@@ -30,7 +32,7 @@ Future<void> runServer(String basePath) async {
 
 Future<void> handleRequest(String basePath, HttpRequest request) async {
   String path = request.uri.path;
-  String resultPath = path == '/' || path == '\\' ? '\\index.html' : path;
+  String resultPath = path == '/' || path == '\\' ? '${Platform.pathSeparator}index.html' : path;
   File file = File('$basePath$resultPath');
 
   var subs = path.replaceAll('\\', '/').split('/').where((str) => str.trim().isNotEmpty).toList();
@@ -82,7 +84,16 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
   request.response.close();
 }
 
+// main.dart [port] [build dir] [chromedriver path]
 Future<void> main(List<String> args) async {
+  if (args.isEmpty || args[0].toLowerCase() == 'help') {
+    print('Usage: main.dart [port] [build dir] [chromedriver path]');
+    return;
+  }
+
+  driverController.driverLocation = args.elementAt(2) ?? 'chromedriver';
+  _port = int.parse(args.elementAt(0)) ?? _port;
+
   if (await driverController.isDriverRunning()) {
     print('Grabbing initial instances...');
     await instanceManager.initCurrentInstances();
@@ -91,5 +102,5 @@ Future<void> main(List<String> args) async {
     print('Driver not running, so not checking for initial instances.');
   }
 
-  await runServer(args.isNotEmpty ? args[0] : File(Platform.script.toFilePath()).parent.path);
+  await runServer(args.elementAt(1) ?? File(Platform.script.toFilePath()).parent.path);
 }

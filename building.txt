@@ -1,1 +1,0 @@
-pub global run webdev build --output=web:buildcp -a bin/. build/

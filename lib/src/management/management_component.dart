@@ -10,12 +10,9 @@ import 'package:angular/security.dart';
 import 'dart:convert';
 import 'dart:html';
 
-import 'package:SeleniumHub/selenium_instance.dart';
 import 'package:angular/angular.dart';
 import 'package:angular_components/angular_components.dart';
 import 'package:angular_router/angular_router.dart';
-import 'package:recase/recase.dart';
-import 'package:clippy/browser.dart' as clippy;
 
 import '../routes.dart';
 
@@ -70,33 +67,35 @@ class ManagementComponent implements OnInit {
   }
 
   void reloadStatuses() async {
-    var apiStatus = await request('//localhost:42069/api/youUp');
-    backendStatus = apiStatus == 'yeah wyd';
+    try {
+      var apiStatus = await request('${Uri.base.origin}/api/youUp');
+      backendStatus = apiStatus == 'yeah wyd';
+    } catch (e) {}
 
     // Bruh you're on the webserver
     webserverStatus = true;
 
-    var driverStatus = await request('//localhost:42069/api/getDriverStatus');
-    webdriverStatus = driverStatus == 'The driver is running';
+    try {
+      var driverStatus = await request('${Uri.base.origin}/api/getDriverStatus');
+      webdriverStatus = driverStatus == 'The driver is running';
+    } catch (e) {}
   }
 
   void confirmStop() async {
     showConfirmation = false;
-    await HttpRequest.getString('//localhost:42069/api/stopDriver');
+    await HttpRequest.getString('${Uri.base.origin}/api/stopDriver');
     print('Stopped webdriver.');
   }
 
   Future<void> startDriver() async {
-    await request('//localhost:42069/api/startDriver');
+    await request('${Uri.base.origin}/api/startDriver');
     reloadStatuses();
   }
 
   Future<String> request(String url) async {
     try {
       return jsonDecode(await HttpRequest.getString(url))['message'];
-    } catch (e) {
-      print(e);
-    }
+    } catch (e) {}
     return '';
   }
 

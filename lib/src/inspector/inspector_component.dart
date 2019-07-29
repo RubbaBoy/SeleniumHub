@@ -71,7 +71,7 @@ class InspectorComponent implements OnInit {
       return;
     }
 
-    iFrameLink = 'http://localhost:42069/devtools/$sessionId/inspector.html?ws=localhost:6970/devtools/$sessionId/page/$page';
+    iFrameLink = '${Uri.base.origin}/devtools/$sessionId/inspector.html?ws=localhost:6970/devtools/$sessionId/page/$page';
   }
 
   void copy(String copy) => clippy.write(copy);
