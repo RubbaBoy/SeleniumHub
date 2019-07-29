@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:mirrors';
 
+import 'package:args/args.dart';
 import 'package:mime/mime.dart';
 
 import 'inspector/inspector_http_proxy.dart';
@@ -24,7 +25,7 @@ Map<String, RawRequestable> DART_FILES = {
 
 Future<void> runServer(String basePath) async {
   final server = await HttpServer.bind('0.0.0.0', _port);
-  print('Webserver open on localhost:42069');
+  print('Webserver open on localhost:${_port}');
   await for (HttpRequest request in server) {
     await handleRequest(basePath, request);
   }
@@ -87,12 +88,19 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
 // main.dart [port] [build dir] [chromedriver path]
 Future<void> main(List<String> args) async {
   if (args.isEmpty || args[0].toLowerCase() == 'help') {
-    print('Usage: main.dart [port] [build dir] [chromedriver path]');
+    print('Usage: main.dart --port [port] --build [build dir] --driver [chromedriver path]');
     return;
   }
 
-  driverController.driverLocation = args.elementAt(2) ?? 'chromedriver';
-  _port = int.parse(args.elementAt(0)) ?? _port;
+  var parser = ArgParser()
+    ..addOption('port', abbr: 'p', defaultsTo: '42069')
+    ..addOption('build', abbr: 'b', defaultsTo: '${File(Platform.script.toFilePath()).parent.parent.path}/build')
+    ..addOption('driver', abbr: 'd', defaultsTo: '/usr/bin/chromedriver');
+
+  var result = parser.parse(args);
+
+  driverController.driverLocation = result['driver'];
+  _port = int.parse(result['port']);
 
   if (await driverController.isDriverRunning()) {
     print('Grabbing initial instances...');
@@ -102,5 +110,5 @@ Future<void> main(List<String> args) async {
     print('Driver not running, so not checking for initial instances.');
   }
 
-  await runServer(args.elementAt(1) ?? File(Platform.script.toFilePath()).parent.path);
+  await runServer(result['build']);
 }
