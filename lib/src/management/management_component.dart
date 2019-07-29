@@ -70,24 +70,24 @@ class ManagementComponent implements OnInit {
   }
 
   void reloadStatuses() async {
-    var apiStatus = await request('//localhost:6969/api/youUp');
+    var apiStatus = await request('//localhost:42069/api/youUp');
     backendStatus = apiStatus == 'yeah wyd';
 
     // Bruh you're on the webserver
     webserverStatus = true;
 
-    var driverStatus = await request('//localhost:6969/api/getDriverStatus');
+    var driverStatus = await request('//localhost:42069/api/getDriverStatus');
     webdriverStatus = driverStatus == 'The driver is running';
   }
 
   void confirmStop() async {
     showConfirmation = false;
-    await HttpRequest.getString('//localhost:6969/api/stopDriver');
+    await HttpRequest.getString('//localhost:42069/api/stopDriver');
     print('Stopped webdriver.');
   }
 
   Future<void> startDriver() async {
-    await request('//localhost:6969/api/startDriver');
+    await request('//localhost:42069/api/startDriver');
     reloadStatuses();
   }
 

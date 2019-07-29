@@ -22,7 +22,7 @@ Map<String, RawRequestable> DART_FILES = {
 };
 
 Future<void> runServer(String basePath) async {
-  final server = await HttpServer.bind('127.0.0.1', 6969);
+  final server = await HttpServer.bind('127.0.0.1', 42069);
   await for (HttpRequest request in server) {
     await handleRequest(basePath, request);
   }

@@ -73,7 +73,7 @@ class InstancesComponent implements OnInit {
   InstancesComponent(this.sanitizer);
 
   Future<String> getData() async {
-    var path = '//localhost:6969/api/getInstances';
+    var path = '//localhost:42069/api/getInstances';
     try {
       return await HttpRequest.getString(path);
     } catch (e) {
@@ -84,7 +84,7 @@ class InstancesComponent implements OnInit {
 
   Future<Map<String, String>> getRevisions() async {
     try {
-      var json = await HttpRequest.getString('//localhost:6969/api/getRevisions');
+      var json = await HttpRequest.getString('//localhost:42069/api/getRevisions');
       Map<String, String> result = {};
       jsonDecode(json).forEach((json) => result[json['sessionId']] = json['revisionId']);
       return result;
@@ -96,7 +96,7 @@ class InstancesComponent implements OnInit {
 
   @override
   Future ngOnInit() async {
-    var json = await HttpRequest.getString('//localhost:6969/api/getSettings');
+    var json = await HttpRequest.getString('//localhost:42069/api/getSettings');
     settings = Settings.fromJson(jsonDecode(json));
     checkRevisions();
   }
@@ -123,7 +123,7 @@ class InstancesComponent implements OnInit {
         var revisedParam = updateScreenshotIds.map((instance) =>
         instance.sessionId).join(',');
         var json = jsonDecode(await HttpRequest.getString(
-            '//localhost:6969/api/getRevised?sessionIds=$revisedParam'));
+            '//localhost:42069/api/getRevised?sessionIds=$revisedParam'));
         json.forEach((json) => getInst(json['sessionId'])
             ..revisionId = json['revisionId']
             ..screenshot = json['screenshot']
@@ -133,7 +133,7 @@ class InstancesComponent implements OnInit {
       if (newIds.isNotEmpty) {
         var revisedParam = newIds.join(',');
         var json = jsonDecode(await HttpRequest.getString(
-            '//localhost:6969/api/getInstances?sessionIds=$revisedParam'));
+            '//localhost:42069/api/getInstances?sessionIds=$revisedParam'));
         json.forEach((json) {
           instances.add(SeleniumInstance.fromJson(json));
           print('New instance ${json['sessionId']}');
@@ -161,7 +161,7 @@ class InstancesComponent implements OnInit {
     showConfirmation = false;
     print('User confirmed to stop $confirmingId');
     HttpRequest.getString(
-        '//localhost:6969/api/stopInstances?sessionIds=$confirmingId');
+        '//localhost:42069/api/stopInstances?sessionIds=$confirmingId');
   }
 
   void showInfoModal(SeleniumInstance instance) {
@@ -184,7 +184,7 @@ class InstancesComponent implements OnInit {
 
   void openInspectChooser(SeleniumInstance instance) {
     HttpRequest.getString(
-        '//localhost:6969/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
+        '//localhost:42069/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
           print('Response: $response');
           inspectWindows.clear();
           inspectingInstance = instance;
