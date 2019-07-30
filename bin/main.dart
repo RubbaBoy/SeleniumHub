@@ -91,7 +91,7 @@ void setResponseCode(HttpRequest request, int code, {String message = ''}) {
 
 // main.dart [port] [build dir] [chromedriver path]
 Future<void> main(List<String> args) async {
-  websocketProxy = InspectorWebsocketProxy(instanceManager);
+  websocketProxy = InspectorWebsocketProxy(instanceManager)..start();
   instanceManager.websocketProxy = websocketProxy;
   if (args.isNotEmpty && args[0].toLowerCase() == '--help') {
     print('Usage: main.dart --port [port] --build [build dir] --driver [chromedriver path]');

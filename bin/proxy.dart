@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 final RegExp _straySlashes = RegExp(r'(^/+)|(/+$)');
 final MediaType _fallbackMediaType = MediaType('application', 'octet-stream');
 
+// Code adapted from angel_proxy https://pub.dev/packages/angel_proxy under MIT license.
 class Proxy {
   String _prefix;
 
@@ -23,6 +24,9 @@ class Proxy {
 
   /// If `null` then no timout is added for requests
   final Duration timeout;
+
+  WebSocket local;
+  WebSocket remote;
 
   Proxy(
       this.httpClient,
@@ -39,7 +43,11 @@ class Proxy {
     _prefix = publicPath?.replaceAll(_straySlashes, '') ?? '';
   }
 
-  void close() => httpClient.close();
+  void close() {
+    local?.close();
+    remote?.close();
+    httpClient?.close();
+  }
 
   /// Handles an incoming HTTP request.
   Future<bool> handleRequest(RequestContext req, ResponseContext res) {
@@ -63,6 +71,9 @@ class Proxy {
 
     var thisUri = Uri.parse(toUri);
     var uri = thisUri.replace(path: thisUri.path + path.substring(42));
+    print(thisUri.path);
+    print(path);
+    print(uri);
 
     try {
       if (req is HttpRequestContext &&
@@ -71,8 +82,8 @@ class Proxy {
         uri = uri.replace(scheme: uri.scheme == 'https' ? 'wss' : 'ws');
 
         try {
-          var local = await WebSocketTransformer.upgrade(req.rawRequest);
-          var remote = await WebSocket.connect(uri.toString());
+          local = await WebSocketTransformer.upgrade(req.rawRequest);
+          remote = await WebSocket.connect(uri.toString());
 
           scheduleMicrotask(() => local.pipe(remote));
           scheduleMicrotask(() => remote.pipe(local));
