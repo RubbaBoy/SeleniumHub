@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:SeleniumHub/src/settings.dart';
-import 'package:SeleniumHub/selenium_instance.dart';
-import 'package:uuid/uuid.dart';
 import 'package:http/http.dart' as http;
 
 import 'instance_manager.dart';
