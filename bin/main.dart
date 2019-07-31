@@ -5,6 +5,7 @@ import 'dart:mirrors';
 
 import 'package:args/args.dart';
 import 'package:mime/mime.dart';
+import 'package:pedantic/pedantic.dart';
 
 import 'inspector/inspector_http_proxy.dart';
 import 'inspector/inspector_ws_proxy.dart';
@@ -28,9 +29,9 @@ Map<String, RawRequestable> DART_FILES = {
 Future<void> runServer(String basePath) async {
   final server = await HttpServer.bind('0.0.0.0', _port);
   print('Webserver open on localhost:${_port}');
-  await for (HttpRequest request in server) {
-    await handleRequest(basePath, request);
-  }
+  server.listen((request) {
+    unawaited(handleRequest(basePath, request));
+  });
 }
 
 Future<void> handleRequest(String basePath, HttpRequest request) async {

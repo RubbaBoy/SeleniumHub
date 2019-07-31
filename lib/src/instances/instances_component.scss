@@ -55,6 +55,7 @@ $mdc-card-image: 'https://rubbaboy.me/images/n2mycge';
 // their parent.
 .instance-size {
   width: $mat-grid * 44;
+  margin-bottom: 25px !important;
 }
 
 // Provide material styling for the title.
@@ -94,6 +95,7 @@ section {
 
 .card-container {
   display: flex;
+  flex-wrap: wrap;
 }
 
 .mdc-card {

@@ -26,6 +26,7 @@ dependencies:
   args: ^1.5.2
   angel_proxy: ^2.1.2
   angel_framework: ^2.0.4+1
+  pedantic: ^1.8.0
 
 dev_dependencies:
   build_runner: ^1.6.2

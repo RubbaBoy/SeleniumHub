@@ -49,7 +49,7 @@ class InstanceManager {
     }
   }
 
-  Future<String> getUrl(String id) => client
+  Future<String> getUrl(String id) async => await client
         .get('http://localhost:4444/session/$id/url')
         .then((response) => jsonDecode(response.body)['value']);
 
@@ -107,7 +107,12 @@ class InstanceWatcher {
 
   void stop() => timer.cancel();
 
-  static Future<bool> canConnect(String id) => client
-        .get('http://localhost:4444/session/$id/url')
-        .then((response) => jsonDecode(response.body)['status'] == 0);
+  static Future<bool> canConnect(String id) {
+    try {
+      return client
+          .get('http://localhost:4444/session/$id/url')
+          .then((response) => jsonDecode(response.body)['status'] == 0);
+    } catch (ignored) {}
+    return Future.value(false);
+  }
 }
