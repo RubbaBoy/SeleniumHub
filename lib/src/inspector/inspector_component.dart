@@ -4,6 +4,7 @@
 import 'dart:async';
 
 import 'package:SeleniumHub/src/instances/instances_component.dart';
+import 'package:SeleniumHub/src/settings.dart';
 import 'package:SeleniumHub/src/settings/settings_component.dart';
 import 'package:angular/security.dart';
 import 'dart:convert';
@@ -71,7 +72,7 @@ class InspectorComponent implements OnInit {
       return;
     }
 
-    iFrameLink = '${Uri.base.origin}/devtools/$sessionId/inspector.html?ws=${Uri.base.host}:6970/devtools/$sessionId/page/$page';
+    iFrameLink = '$urlBase/devtools/$sessionId/inspector.html?ws=${Uri.base.host}:6970/devtools/$sessionId/page/$page';
   }
 
   void copy(String copy) => clippy.write(copy);

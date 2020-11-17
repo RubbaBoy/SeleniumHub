@@ -19,7 +19,7 @@ class InstanceManager {
   }
 
   void addWatcher(SeleniumInstance instance) =>
-      watchers.add(InstanceWatcher(instance)..start(this, () => deleteInstance(instance.sessionId)));
+      watchers.add(InstanceWatcher(instance)..start(this, () async => await deleteInstance(instance.sessionId)));
 
   void removeWatcher(SeleniumInstance instance) {
     watchers.where((watcher) => watcher.instance == instance).toList().forEach((watcher) {
@@ -28,10 +28,16 @@ class InstanceManager {
     });
   }
 
-  void deleteInstance(String id) {
+  Future<void> deleteInstance(String id) async {
+    print('Deleting $id');
     websocketProxy.stopInstance(id);
-    client.delete('http://localhost:4444/session/$id');
+    try {
+      await client.delete('http://localhost:4444/session/$id');
+    } catch (e) {
+      print('An error occurred while deleting instance $id: $e');
+    }
     var instance = instances.firstWhere((instance) => instance.sessionId == id, orElse: () => null);
+    print('Instance: $instance');
     if (instance != null) {
       removeWatcher(instance);
       instances.remove(instance);
@@ -49,9 +55,15 @@ class InstanceManager {
     }
   }
 
-  Future<String> getUrl(String id) async => await client
-        .get('http://localhost:4444/session/$id/url')
-        .then((response) => jsonDecode(response.body)['value']);
+  Future<String> getUrl(String id) async {
+    try {
+      var response = await client.get('http://localhost:4444/session/$id/url');
+      return jsonDecode(response.body)['value'];
+    } catch (e) {
+      print('An error occurred while getting the URL fort $id: $e');
+      return 'unknown';
+    }
+  }
 
   int getPort(SeleniumInstance instance) => int.parse(instance.debuggerAddress.split(':')[1]);
 
@@ -65,7 +77,7 @@ class InstanceManager {
       var id = value['id'];
       if (!(await InstanceWatcher.canConnect(id))) {
         print('Can\'t initially connect to $id');
-        deleteInstance(id);
+        await deleteInstance(id);
         continue;
       }
 
@@ -107,11 +119,10 @@ class InstanceWatcher {
 
   void stop() => timer.cancel();
 
-  static Future<bool> canConnect(String id) {
+  static Future<bool> canConnect(String id) async {
     try {
-      return client
-          .get('http://localhost:4444/session/$id/url')
-          .then((response) => jsonDecode(response.body)['status'] == 0);
+      var response = await client.get('http://localhost:4444/session/$id/url');
+      return jsonDecode(response.body)['value'] != null;
     } catch (ignored) {}
     return Future.value(false);
   }

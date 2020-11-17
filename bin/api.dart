@@ -43,16 +43,15 @@ class API extends Requestable {
           'screenshot': instance.screenshot,
           'url': instance.url
         }).toList());
-        break;
       case 'stopInstances':
         var ids = queryParams['sessionIds'];
         if (ids == null) return {'message': 'Required query parameter: sessionIds'};
         var sessionIds = ids.split(',');
-        sessionIds.forEach((id) async {
-          await client.delete('http://localhost:4444/session/$id');
-          instanceManager.deleteInstance(id);
-        });
-        break;
+        print('Stopping instances: $sessionIds');
+        for (var id in sessionIds) {
+          await instanceManager.deleteInstance(id);
+        }
+        return {'message': 'Thanks'};
       case 'devToolsList':
         var id = queryParams['sessionId'];
         if (id == null) return {'message': 'Required query parameter: sessionId'};
@@ -64,7 +63,7 @@ class API extends Requestable {
         try {
           settingsFile = await File('settings.json').readAsString();
         } catch (e) {
-          print(e);
+          print('Error while reading from getSettings $e');
         }
         return Settings.fromJson(jsonDecode(settingsFile)).toJson();
       case 'setSettings':
@@ -77,6 +76,7 @@ class API extends Requestable {
               jsonEncode(settings.toJson()));
           print('Writing: ${jsonEncode(settings.toJson())}');
         } catch (e) {
+          print('Error while writing to settings: $e');
           return {'message': 'An error occured. Here are the details: $e'};
         }
         return {'message': 'Successfully wrote to settings'};

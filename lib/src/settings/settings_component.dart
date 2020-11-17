@@ -74,7 +74,7 @@ class SettingsComponent implements OnInit {
   }
 
   void initSettings() async {
-    var json = await HttpRequest.getString('${Uri.base.origin}/api/getSettings');
+    var json = await HttpRequest.getString('$urlBase/api/getSettings');
     settings = Settings.fromJson(jsonDecode(json));
     updateScreenshots = settings.updateScreenshots;
     screenshotInterval = settings.screenshotInterval;
@@ -82,7 +82,7 @@ class SettingsComponent implements OnInit {
 
   void saveConfig() {
     print('Saving config ${jsonEncode(settings.toJson())}');
-    HttpRequest.getString('${Uri.base.origin}/api/setSettings?value=${jsonEncode(settings.toJson())}').then((result) {
+    HttpRequest.getString('$urlBase/api/setSettings?value=${jsonEncode(settings.toJson())}').then((result) {
       var message = jsonDecode(result)['message'];
       isError = message != 'Successfully wrote to settings';
       saveStatus = message;

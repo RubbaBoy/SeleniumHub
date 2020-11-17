@@ -74,7 +74,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
   InstancesComponent(this.sanitizer);
 
   Future<String> getData() async {
-    var path = '${Uri.base.origin}/api/getInstances';
+    var path = '$urlBase/api/getInstances';
     try {
       return await HttpRequest.getString(path);
     } catch (e) {
@@ -85,7 +85,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
 
   Future<Map<String, String>> getRevisions() async {
     try {
-      var json = await HttpRequest.getString('${Uri.base.origin}/api/getRevisions');
+      var json = await HttpRequest.getString('$urlBase/api/getRevisions');
       Map<String, String> result = {};
       jsonDecode(json).forEach((json) => result[json['sessionId']] = json['revisionId']);
       return result;
@@ -98,7 +98,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
   @override
   Future onActivate(RouterState previous, RouterState current) async {
     stop = false;
-    var json = await HttpRequest.getString('${Uri.base.origin}/api/getSettings');
+    var json = await HttpRequest.getString('$urlBase/api/getSettings');
     settings = Settings.fromJson(jsonDecode(json));
     checkRevisions();
   }
@@ -130,7 +130,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
         var revisedParam = updateScreenshotIds.map((instance) =>
         instance.sessionId).join(',');
         var json = jsonDecode(await HttpRequest.getString(
-            '${Uri.base.origin}/api/getRevised?sessionIds=$revisedParam'));
+            '$urlBase/api/getRevised?sessionIds=$revisedParam'));
         json.forEach((json) => getInst(json['sessionId'])
             ..revisionId = json['revisionId']
             ..screenshot = json['screenshot']
@@ -140,7 +140,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
       if (newIds.isNotEmpty) {
         var revisedParam = newIds.join(',');
         var json = jsonDecode(await HttpRequest.getString(
-            '${Uri.base.origin}/api/getInstances?sessionIds=$revisedParam'));
+            '$urlBase/api/getInstances?sessionIds=$revisedParam'));
         json.forEach((json) {
           instances.add(SeleniumInstance.fromJson(json));
           print('New instance ${json['sessionId']}');
@@ -168,7 +168,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
     showConfirmation = false;
     print('User confirmed to stop $confirmingId');
     HttpRequest.getString(
-        '${Uri.base.origin}/api/stopInstances?sessionIds=$confirmingId');
+        '$urlBase/api/stopInstances?sessionIds=$confirmingId');
   }
 
   void showInfoModal(SeleniumInstance instance) {
@@ -191,7 +191,7 @@ class InstancesComponent implements OnActivate, OnDeactivate {
 
   void openInspectChooser(SeleniumInstance instance) {
     HttpRequest.getString(
-        '${Uri.base.origin}/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
+        '$urlBase/api/devToolsList?sessionId=${instance.sessionId}').then((response) {
           print('Response: $response');
           inspectWindows.clear();
           inspectingInstance = instance;

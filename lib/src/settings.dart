@@ -1,3 +1,8 @@
+// TODO: Put in settings?
+const DEBUG = true;
+
+String get urlBase => DEBUG ? '//localhost:42069' : Uri.base.origin;
+
 class Settings {
   int screenshotInterval;
   bool updateScreenshots;

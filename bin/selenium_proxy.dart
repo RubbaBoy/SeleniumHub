@@ -61,6 +61,8 @@ class SeleniumProxy extends RawRequestable {
       }
       print('Created instance with session ID of $sessionId');
 
+      value = value['capabilities'] ?? value;
+
       // TODO: Assuming chrome for now
       instanceManager.addInstance(SeleniumInstance(
           sessionId,

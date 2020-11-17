@@ -5,6 +5,7 @@ import 'dart:async';
 
 import 'package:SeleniumHub/src/inspector/inspector_component.dart';
 import 'package:SeleniumHub/src/instances/instances_component.dart';
+import 'package:SeleniumHub/src/settings.dart';
 import 'package:SeleniumHub/src/settings/settings_component.dart';
 import 'package:angular/security.dart';
 import 'dart:convert';
@@ -80,7 +81,7 @@ class ManagementComponent implements OnInit, OnDestroy {
 
   void reloadStatuses() async {
     try {
-      var apiStatus = await request('${Uri.base.origin}/api/youUp');
+      var apiStatus = await request('$urlBase/api/youUp');
       backendStatus = apiStatus == 'yeah wyd';
     } catch (e) {}
 
@@ -88,19 +89,19 @@ class ManagementComponent implements OnInit, OnDestroy {
     webserverStatus = true;
 
     try {
-      var driverStatus = await request('${Uri.base.origin}/api/getDriverStatus');
+      var driverStatus = await request('$urlBase/api/getDriverStatus');
       webdriverStatus = driverStatus == 'The driver is running';
     } catch (e) {}
   }
 
   void confirmStop() async {
     showConfirmation = false;
-    await HttpRequest.getString('${Uri.base.origin}/api/stopDriver');
+    await HttpRequest.getString('$urlBase/api/stopDriver');
     print('Stopped webdriver.');
   }
 
   Future<void> startDriver() async {
-    await request('${Uri.base.origin}/api/startDriver');
+    await request('$urlBase/api/startDriver');
     reloadStatuses();
   }
 
